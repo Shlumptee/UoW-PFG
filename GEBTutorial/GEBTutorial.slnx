@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="GEBTutorial/GEBTutorial.vcxproj" Id="99c47b0a-c766-4add-a370-c23ee57d365c" />
+</Solution>
