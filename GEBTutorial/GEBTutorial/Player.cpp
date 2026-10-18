@@ -5,6 +5,7 @@
 void Player::Init()
 {
 	image.load("./assets/Circle.png");
+	abilityTimer.reset();
 }
 
 void Player::HandleInput()

@@ -22,23 +22,6 @@ void GameLoop::HandleInput()
         isRunning = false;
     }
 
-    if (canvas.keyPressed('A'))
-    {
-        player->MoveLeft();
-    }
-    if (canvas.keyPressed('D'))
-    {
-        player->MoveRight();
-    }
-    if (canvas.keyPressed('S'))
-    {
-        player->MoveDown();
-    }
-    if (canvas.keyPressed('W'))
-    {
-        player->MoveUp();
-    }
-
     if (canvas.keyPressed(VK_SHIFT))
     {
         if (canvas.keyPressed('R'))
@@ -48,6 +31,7 @@ void GameLoop::HandleInput()
             {
                 red = 0;
             }
+            return;
         }
         if (canvas.keyPressed('G'))
         {
@@ -56,6 +40,7 @@ void GameLoop::HandleInput()
             {
                 green = 0;
             }
+            return;
         }
         if (canvas.keyPressed('B'))
         {
@@ -64,7 +49,10 @@ void GameLoop::HandleInput()
             {
                 blue = 0;
             }
+            return;
         }
+
+		player->MoveAbility();
     }
     else if (canvas.keyPressed(VK_CONTROL))
     {
@@ -92,6 +80,23 @@ void GameLoop::HandleInput()
                 blue = 255;
             }
         }
+    }
+
+    if (canvas.keyPressed('A'))
+    {
+        player->MoveLeft();
+    }
+    if (canvas.keyPressed('D'))
+    {
+        player->MoveRight();
+    }
+    if (canvas.keyPressed('S'))
+    {
+        player->MoveDown();
+    }
+    if (canvas.keyPressed('W'))
+    {
+        player->MoveUp();
     }
 }
 
