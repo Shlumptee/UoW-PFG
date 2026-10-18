@@ -8,6 +8,9 @@ int GameLoop::Init()
     canvas.create(1024, 768, "Tiles");
     isRunning = true; // Variable to control the main loop's running state.
 
+	player = new Player(canvas);
+    player->Init();
+
     return 1;
 }
 
@@ -18,6 +21,24 @@ void GameLoop::HandleInput()
     {
         isRunning = false;
     }
+
+    if (canvas.keyPressed('A'))
+    {
+        player->MoveLeft();
+    }
+    if (canvas.keyPressed('D'))
+    {
+        player->MoveRight();
+    }
+    if (canvas.keyPressed('S'))
+    {
+        player->MoveDown();
+    }
+    if (canvas.keyPressed('W'))
+    {
+        player->MoveUp();
+    }
+
     if (canvas.keyPressed(VK_SHIFT))
     {
         if (canvas.keyPressed('R'))
@@ -76,6 +97,7 @@ void GameLoop::HandleInput()
 
 void GameLoop::Update()
 {
+	player->Update();
 }
 
 void GameLoop::Draw()
@@ -93,7 +115,7 @@ void GameLoop::Draw()
         canvas.draw(70, i, 255, 255, 255);
     }
 
-    image.load("./assets/Circle.png");
+    /*image.load("./assets/Circle.png");
     for (int i = 0; i < image.width; i++)
     {
         for (int j = 0; j < image.height; j++)
@@ -106,5 +128,15 @@ void GameLoop::Draw()
             unsigned char* pixel = image.at(i, j);
             canvas.draw(100 + i, 100 + j, red, green, blue);
         }
-    }
+    }*/
+
+	player->Draw();
+}
+
+void GameLoop::Destroy()
+{
+	canvas.~Window();
+	player->Destroy();
+
+    delete player;
 }
