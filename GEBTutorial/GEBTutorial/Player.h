@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GamesEngineeringBase.h"
+#include "Vector2.h"
 
 
 class Player
@@ -19,45 +20,45 @@ public:
 
 	void MoveLeft()
 	{
-		position[0] -= moveSpeed;
+		position.x -= moveSpeed;
 		orientation = 3;
 
-		if (position[0] < 0)
+		if (position.x < 0)
 		{
-			position[0] = 0;
+			position.x = 0;
 		}
 	}
 
 	void MoveRight()
 	{
-		position[0] += moveSpeed;
+		position.x += moveSpeed;
 		orientation = 1;
 
-		if (position[0] > canvas.getWidth() - image.width)
+		if (position.x > canvas.getWidth() - image.width)
 		{
-			position[0] = canvas.getWidth() - image.width;
+			position.x = canvas.getWidth() - image.width;
 		}
 	}
 
 	void MoveDown()
 	{
-		position[1] += moveSpeed;
+		position.y += moveSpeed;
 		orientation = 2;
 
-		if (position[1] > (canvas.getHeight() - image.height))
+		if (position.y > (canvas.getHeight() - image.height))
 		{
-			position[1] = canvas.getHeight() - image.height;
+			position.y = canvas.getHeight() - image.height;
 		}
 	}
 
 	void MoveUp()
 	{
-		position[1] -= moveSpeed;
+		position.y -= moveSpeed;
 		orientation = 0;
 
-		if (position[1] < 0)
+		if (position.y < 0)
 		{
-			position[1] = 0;
+			position.y = 0;
 		}
 	}
 
@@ -71,31 +72,31 @@ public:
 		switch (orientation)
 		{
 		case 0:
-			position[1] -= moveSpeed * 50;
-			if (position[1] < 0)
+			position.y -= moveSpeed * 50;
+			if (position.y < 0)
 			{
-				position[1] = 0;
+				position.y = 0;
 			}
 			break;
 		case 1:
-			position[0] += moveSpeed * 50;
-			if (position[0] > canvas.getWidth() - image.width)
+			position.x += moveSpeed * 50;
+			if (position.x > canvas.getWidth() - image.width)
 			{
-				position[0] = canvas.getWidth() - image.width;
+				position.x = canvas.getWidth() - image.width;
 			}
 			break;
 		case 2:
-			position[1] += moveSpeed * 50;
-			if (position[1] > (canvas.getHeight() - image.height))
+			position.y += moveSpeed * 50;
+			if (position.y > (canvas.getHeight() - image.height))
 			{
-				position[1] = canvas.getHeight() - image.height;
+				position.y = canvas.getHeight() - image.height;
 			}
 			break;
 		case 3:
-			position[0] -= moveSpeed * 50;
-			if (position[0] < 0)
+			position.x -= moveSpeed * 50;
+			if (position.x < 0)
 			{
-				position[0] = 0;
+				position.x = 0;
 			}
 			break;
 		default:
@@ -107,7 +108,7 @@ public:
 
 private:
 	int moveSpeed = 1;
-	int position[2] = { 100, 100 };
+	Vector2 position = Vector2(100, 100);
 	unsigned int orientation = 0;
 
 	float abilityCooldown = 1.0f;

@@ -148,7 +148,9 @@
     <ClInclude Include="GameLoop.h" />
     <ClInclude Include="GamesEngineeringBase.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Shape.h" />
     <ClInclude Include="Tilemap.h" />
+    <ClInclude Include="Vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

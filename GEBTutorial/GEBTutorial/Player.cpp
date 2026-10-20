@@ -30,7 +30,7 @@ void Player::HandleInput()
 
 void Player::Update()
 {
-	//std::cout << "Player position: (" << position[0] << ", " << position[1] << ")" << std::endl;
+	//std::cout << "Player position: (" << position.x << ", " << position.y << ")" << std::endl;
 }
 
 void Player::Draw()
@@ -45,7 +45,7 @@ void Player::Draw()
 			}
 
 			unsigned char* pixel = image.at(i, j);
-			canvas.draw(position[0] + i, position[1] + j, pixel[0], pixel[1], pixel[2]);
+			canvas.draw(position.x + i, position.y + j, pixel[0], pixel[1], pixel[2]);
 		}
 	}
 }
