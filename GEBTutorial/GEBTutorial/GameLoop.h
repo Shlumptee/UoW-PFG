@@ -22,6 +22,10 @@ public:
 
 private:
 	unsigned int red = 0, green = 0, blue = 0;
-	Player* player;
+	Player player;
+
+	float deltaTime = 0.0f;
+
+	GamesEngineeringBase::Timer timer;
 };
 

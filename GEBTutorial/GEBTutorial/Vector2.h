@@ -4,8 +4,8 @@
 class Vector2
 {
 public:
-	int x;
-	int y;
+	float x;
+	float y;
 
 	Vector2()
 	{
@@ -32,6 +32,15 @@ public:
 	float dot(const Vector2& other)
 	{
 		return x * other.x + y * other.y;
+	}
+
+	Vector2 operator+(const Vector2& other)
+	{
+		return Vector2(x + other.x, y + other.y);
+	}
+	Vector2 operator*(float scalar)
+	{
+		return Vector2(x * scalar, y * scalar);
 	}
 
 	~Vector2()

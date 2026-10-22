@@ -7,9 +7,7 @@ int GameLoop::Init()
     // Create a canvas window with dimensions 1024x768 and title “Tiles"
     canvas.create(1024, 768, "Tiles");
     isRunning = true; // Variable to control the main loop's running state.
-
-	player = new Player(canvas);
-    player->Init();
+    //player->Init();
 
     return 1;
 }
@@ -22,87 +20,28 @@ void GameLoop::HandleInput()
         isRunning = false;
     }
 
-    if (canvas.keyPressed(VK_SHIFT))
-    {
-        if (canvas.keyPressed('R'))
-        {
-            red++;
-            if (red > 255)
-            {
-                red = 0;
-            }
-            return;
-        }
-        if (canvas.keyPressed('G'))
-        {
-            green++;
-            if (green > 255)
-            {
-                green = 0;
-            }
-            return;
-        }
-        if (canvas.keyPressed('B'))
-        {
-            blue++;
-            if (blue > 255)
-            {
-                blue = 0;
-            }
-            return;
-        }
-
-		player->MoveAbility();
-    }
-    else if (canvas.keyPressed(VK_CONTROL))
-    {
-        if (canvas.keyPressed('R'))
-        {
-            red--;
-            if (red < 0)
-            {
-                red = 255;
-            }
-        }
-        if (canvas.keyPressed('G'))
-        {
-            green--;
-            if (green < 0)
-            {
-                green = 255;
-            }
-        }
-        if (canvas.keyPressed('B'))
-        {
-            blue--;
-            if (blue < 0)
-            {
-                blue = 255;
-            }
-        }
-    }
-
+	Vector2 input{ 0, 0 };
     if (canvas.keyPressed('A'))
     {
-        player->MoveLeft();
+        input.x = -1.0f;
     }
     if (canvas.keyPressed('D'))
     {
-        player->MoveRight();
+        input.x = 1.0f;
     }
     if (canvas.keyPressed('S'))
     {
-        player->MoveDown();
+        input.y = -1.0f;
     }
     if (canvas.keyPressed('W'))
     {
-        player->MoveUp();
+        input.y = 1.0f;
     }
 }
 
 void GameLoop::Update()
 {
-	player->Update();
+	player.Update(deltaTime);
 }
 
 void GameLoop::Draw()
