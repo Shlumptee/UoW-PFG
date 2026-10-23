@@ -12,13 +12,13 @@ public:
 		x = 0;
 		y = 0;
 	}
-	Vector2(int _x, int _y)
+	Vector2(float _x, float _y)
 	{
 		x = _x;
 		y = _y;
 	}
 
-	void Set(int _x, int _y)
+	void Set(float _x, float _y)
 	{
 		x = _x;
 		y = _y;
@@ -34,17 +34,12 @@ public:
 		return x * other.x + y * other.y;
 	}
 
-	Vector2 operator+(const Vector2& other)
+	Vector2 operator+(const Vector2& other) const
 	{
 		return Vector2(x + other.x, y + other.y);
 	}
-	Vector2 operator*(float scalar)
+	Vector2 operator*(float scalar) const
 	{
 		return Vector2(x * scalar, y * scalar);
-	}
-
-	~Vector2()
-	{
-		delete this;
 	}
 };

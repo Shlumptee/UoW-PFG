@@ -52,7 +52,7 @@ public:
 	virtual void Update(float deltaTime) = 0;
 	virtual void Draw(GamesEngineeringBase::Window& window)
 	{
-		RenderImage(window, GetPosition(), image);
+		Render_Image(window, GetPosition(), image);
 	}
 	virtual const GamesEngineeringBase::Image& GetImage() const
 	{

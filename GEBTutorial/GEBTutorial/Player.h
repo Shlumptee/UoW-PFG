@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 #include "GamesEngineeringBase.h"
 #include "Entity.h"
@@ -32,7 +33,7 @@ public:
 	}
 	
 private:
-	float moveSpeed = 1.0f;
+	float moveSpeed = 128.0f;
 
 	Vector2 inputAxis;
 

@@ -8,6 +8,7 @@ int GameLoop::Init()
     canvas.create(1024, 768, "Tiles");
     isRunning = true; // Variable to control the main loop's running state.
     //player->Init();
+	player = new Player(Vector2(100, 100), "./assets/Circle.png");
 
     return 1;
 }
@@ -20,28 +21,32 @@ void GameLoop::HandleInput()
         isRunning = false;
     }
 
-	Vector2 input{ 0, 0 };
+	input.Set(0, 0);
     if (canvas.keyPressed('A'))
     {
-        input.x = -1.0f;
+        input.x -= 1.0f;
     }
     if (canvas.keyPressed('D'))
     {
-        input.x = 1.0f;
+        input.x += 1.0f;
     }
     if (canvas.keyPressed('S'))
     {
-        input.y = -1.0f;
+        input.y += 1.0f;
     }
     if (canvas.keyPressed('W'))
     {
-        input.y = 1.0f;
+        input.y -= 1.0f;
     }
+
+    player->SetInput(input);
 }
 
 void GameLoop::Update()
 {
-	player.Update(deltaTime);
+	deltaTime = timer.dt();
+
+	player->Update(deltaTime);
 }
 
 void GameLoop::Draw()
@@ -74,13 +79,13 @@ void GameLoop::Draw()
         }
     }*/
 
-	player->Draw();
+	player->Draw(canvas);
 }
 
 void GameLoop::Destroy()
 {
 	canvas.~Window();
-	player->Destroy();
+	//player->Destroy();
 
     delete player;
 }
