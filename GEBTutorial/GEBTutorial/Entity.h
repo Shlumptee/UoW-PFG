@@ -9,6 +9,7 @@ class Entity
 {
 public:
 	Entity() = default;
+	virtual ~Entity() = default;
 };
 
 class PositionEntity : public Entity
@@ -66,6 +67,10 @@ public:
 	virtual int GetHeight() const
 	{
 		return image.height;
+	}
+	Rect GetBoundingBox() const
+	{
+		return Rect(Vector2(GetPosition().x, GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y - GetHeight()));
 	}
 	const std::string& GetImagePath() const
 	{

@@ -1,14 +1,20 @@
 #include <iostream>
 
 #include "GameLoop.h"
+#include "Vector2.h"
+#include "Enemy.h"
+#include "Renderer.h"
 
 int GameLoop::Init()
 {
     // Create a canvas window with dimensions 1024x768 and title “Tiles"
-    canvas.create(1024, 768, "Tiles");
+    canvas.create(1024, 768, "Blast'ems++");
     isRunning = true; // Variable to control the main loop's running state.
     //player->Init();
 	player = new Player(Vector2(100, 100), "./assets/Circle.png");
+	entities.Push(player);
+
+    entities.Push(new Enemy(Vector2(500, 300), "./assets/Enemy.png"));
 
     return 1;
 }
@@ -46,7 +52,10 @@ void GameLoop::Update()
 {
 	deltaTime = timer.dt();
 
-	player->Update(deltaTime);
+	for (int i = 0; i < entities.GetSize(); i++)
+	{
+		entities[i]->Update(deltaTime);
+	}
 }
 
 void GameLoop::Draw()
@@ -79,13 +88,19 @@ void GameLoop::Draw()
         }
     }*/
 
-	player->Draw(canvas);
+	for (int i = 0; i < entities.GetSize(); i++)
+	{
+		entities[i]->Draw(canvas);
+	}
 }
 
 void GameLoop::Destroy()
 {
-	canvas.~Window();
-	//player->Destroy();
+	for (int i = 0; i < entities.GetSize(); i++)
+	{
+		delete entities[i];
+	}
+    entities.Clear();
 
-    delete player;
+    player = nullptr;
 }

@@ -12,30 +12,38 @@ public:
 class Rect : public Shape
 {
 public:
+	Vector2 min;
+	Vector2 max;
+
 	Rect()
 	{
-		length.Set(0, 0);
-		width.Set(0, 0);
+		min.Set(0, 0);
+		max.Set(0, 0);
 	}
-	Rect(Vector2 _length, Vector2 _width)
+	Rect(Vector2 _min, Vector2 _max)
 	{
-		length = _length;
-		width = _width;
+		min = _min;
+		max = _max;
 	}
 
+	void Set(Vector2 _min, Vector2 _max)
+	{
+		min = _min;
+		max = _max;
+	}
+	void Set(Rect rect)
+	{
+		min = rect.min;
+		max = rect.max;
+	}
 	float Area() override
 	{
-		return (length.x - width.x) * (length.y - width.y);
+		return (min.x - max.x) * (min.y - max.y);
 	}
-
 	bool IsInside(Vector2 p) override
 	{
-		return (p.x >= width.x && p.x <= length.x && p.y >= width.y && p.y <= length.y);
+		return (p.x >= max.x && p.x <= min.x && p.y >= max.y && p.y <= min.y);
 	}
-
-private:
-	Vector2 length;
-	Vector2 width;
 };
 
 class Circle : public Shape

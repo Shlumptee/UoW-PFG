@@ -21,10 +21,10 @@ public:
 	GamesEngineeringBase::Window canvas;
 
 private:
-	unsigned int red = 0, green = 0, blue = 0;
-	Player* player;
+	DynamicArray<VisualEntity*> entities;
+	Player* player = nullptr;
 
-	float deltaTime = timer.dt();
+	float deltaTime = 0.0f;
 
 	GamesEngineeringBase::Timer timer;
 	Vector2 input{ 0, 0 };

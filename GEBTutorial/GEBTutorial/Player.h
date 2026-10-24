@@ -12,15 +12,18 @@ class Player : public VisualEntity
 public:
 	Player(const Vector2 position, std::string filePath) : VisualEntity(position, filePath)
 	{
+		std::cout << "Bounding Box: Min(" << boundingBox.min.x << ", " << boundingBox.min.y << "), Max(" << boundingBox.max.x << ", " << boundingBox.max.y << ")" << std::endl;
 	}
 
 	virtual void Update(float deltaTime) override
 	{
+		boundingBox.Set(GetBoundingBox());
 		Move(inputAxis * moveSpeed * deltaTime);
 	}
 	virtual void Draw(GamesEngineeringBase::Window& window) override
 	{
 		VisualEntity::Draw(window);
+		Render_Rect(window, boundingBox, 255, 0, 0, 1);
 	}
 
 	void SetInput(const Vector2& _inputAxis)
@@ -37,7 +40,7 @@ private:
 
 	Vector2 inputAxis;
 
-	Rect boundingBox{ Vector2(0, 0), Vector2(GetWidth(), GetHeight()) };
+	Rect boundingBox{ Vector2(GetPosition().x , GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y - GetHeight())};
 };
 
 class PlayerWarrior : public Player

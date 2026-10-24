@@ -28,6 +28,7 @@ int main() {
         // Display the frame on the screen. This must be called once the frame is finished in order to display the frame.
         gameLoop->canvas.present();
     }
-
+    
+	gameLoop->Destroy();
     return 0;
 }
