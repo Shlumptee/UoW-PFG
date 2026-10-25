@@ -2,6 +2,7 @@
 
 #include "GamesEngineeringBase.h"
 #include "Player.h"
+#include "Quadtree.h"
 
 class GameLoop
 {
@@ -23,6 +24,7 @@ public:
 private:
 	DynamicArray<VisualEntity*> entities;
 	Player* player = nullptr;
+	Quadtree* quadtree = nullptr;
 
 	float deltaTime = 0.0f;
 

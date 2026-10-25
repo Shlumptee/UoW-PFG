@@ -16,11 +16,12 @@ public:
 
 	virtual void Update(float deltaTime) override
 	{
-
+		boundingBox.Set(GetBoundingBox());
 	}
 	virtual void Draw(GamesEngineeringBase::Window& window) override
 	{
 		VisualEntity::Draw(window);
+		Render_Rect(window, boundingBox, 255, 0, 0, 1);
 	}
 
 private:

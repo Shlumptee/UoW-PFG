@@ -70,7 +70,7 @@ public:
 	}
 	Rect GetBoundingBox() const
 	{
-		return Rect(Vector2(GetPosition().x, GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y - GetHeight()));
+		return Rect(Vector2(GetPosition().x, GetPosition().y - GetHeight()), Vector2(GetPosition().x + GetWidth(), GetPosition().y));
 	}
 	const std::string& GetImagePath() const
 	{
