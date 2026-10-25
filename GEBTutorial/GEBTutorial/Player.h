@@ -17,13 +17,22 @@ public:
 
 	virtual void Update(float deltaTime) override
 	{
+		VisualEntity::Update(deltaTime);
+
 		boundingBox.Set(GetBoundingBox());
 		Move(inputAxis * moveSpeed * deltaTime);
+	}
+	virtual void OnCollision(VisualEntity* other) override
+	{
+		VisualEntity::OnCollision(other);
+
+		std::cout << "Player collided with another entity!" << std::endl;
+		SetPosition(boundingBox.min);
 	}
 	virtual void Draw(GamesEngineeringBase::Window& window) override
 	{
 		VisualEntity::Draw(window);
-		Render_Rect(window, boundingBox, 255, 0, 0, 1);
+		Render_Rect(window, boundingBox, GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
 	void SetInput(const Vector2& _inputAxis)
@@ -40,7 +49,7 @@ private:
 
 	Vector2 inputAxis;
 
-	Rect boundingBox{ Vector2(GetPosition().x , GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y - GetHeight())};
+	Rect boundingBox{ Vector2(GetPosition().x , GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y + GetHeight())};
 };
 
 class PlayerWarrior : public Player

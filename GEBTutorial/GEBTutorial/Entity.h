@@ -50,7 +50,14 @@ public:
 		image.load(imagePath);
 	}
 
-	virtual void Update(float deltaTime) = 0;
+	virtual void Update(float deltaTime)
+	{
+		isColliding = false;
+	}
+	virtual void OnCollision(VisualEntity* other)
+	{
+		isColliding = true;
+	}
 	virtual void Draw(GamesEngineeringBase::Window& window)
 	{
 		Render_Image(window, GetPosition(), image);
@@ -68,9 +75,13 @@ public:
 	{
 		return image.height;
 	}
+	virtual bool GetColliding()
+	{
+		return isColliding;
+	}
 	Rect GetBoundingBox() const
 	{
-		return Rect(Vector2(GetPosition().x, GetPosition().y - GetHeight()), Vector2(GetPosition().x + GetWidth(), GetPosition().y));
+		return Rect(Vector2(GetPosition().x, GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y + GetHeight()));
 	}
 	const std::string& GetImagePath() const
 	{
@@ -82,6 +93,8 @@ public:
 	}
 
 private:
+	bool isColliding = false;
+
 	std::string imagePath;
 	GamesEngineeringBase::Image image;
 };

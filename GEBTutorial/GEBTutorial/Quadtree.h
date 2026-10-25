@@ -40,16 +40,18 @@ public:
 	// Split a node within the quadtree into 4 subnodes
 	void Split()
 	{
-		float midX = (bounds.min.x - bounds.max.x) / 2.0f;
-		float midY = (bounds.min.y - bounds.max.y) / 2.0f;
-		float x = bounds.max.x;
-		float y = bounds.max.y;
+		float midX = (bounds.min.x + bounds.max.x) / 2.0f;
+		float midY = (bounds.min.y + bounds.max.y) / 2.0f;
 
 		// Init new nodes
-		nodes[0] = new Quadtree(level + 1, Rect(Vector2(midX, midY), Vector2(x, y)));
-		nodes[1] = new Quadtree(level + 1, Rect(Vector2(x, midY), Vector2(midX, y)));
-		nodes[2] = new Quadtree(level + 1, Rect(Vector2(x, y), Vector2(midX, midY)));
-		nodes[3] = new Quadtree(level + 1, Rect(Vector2(midX, y), Vector2(x, midY)));
+		// Top-right
+		nodes[0] = new Quadtree(level + 1, Rect(Vector2(midX, bounds.min.y), Vector2(bounds.max.x, midY)));
+		// Top-left
+		nodes[1] = new Quadtree(level + 1, Rect(Vector2(bounds.min.x, bounds.min.y), Vector2(midX, midY)));
+		// Bottom-left
+		nodes[2] = new Quadtree(level + 1, Rect(Vector2(bounds.min.x, midY), Vector2(midX, bounds.max.y)));
+		// Bottom-right
+		nodes[3] = new Quadtree(level + 1, Rect(Vector2(midX, midY), Vector2(bounds.max.x, bounds.max.y)));
 	}
 
 	// Determine which node an object belongs to
@@ -60,32 +62,38 @@ public:
 		float midY = (bounds.min.y + bounds.max.y) / 2.0f;
 
 		bool left = rect.max.x <= midX;
+		//std::cout << "Left: " << left << std::endl;
 		bool right = rect.min.x >= midX;
 
-		bool lower = rect.max.y <= midY;
-		bool upper = rect.min.y >= midY;
+		bool upper = rect.max.y <= midY;
+		bool lower = rect.min.y >= midY;
+
+		//std::cout << "Lower: " << lower << std::endl;
 
 		if (left)
 		{
 			if (upper)
 			{
-				return 1; // Top-left
+				// Top-left
+				return 1;
 			}
-			if (lower)
+			else if (lower)
 			{
-				return 2; // Bottom-left
+				// Bottom-left
+				return 2;
 			}
 		}
-
-		if (right)
+		else if (right)
 		{
 			if (upper)
 			{
-				return 0; // Top-right
+				// Top-right
+				return 0;
 			}
-			if (lower)
+			else if (lower)
 			{
-				return 3; // Bottom-right
+				// Bottom-right
+				return 3;
 			}
 		}
 

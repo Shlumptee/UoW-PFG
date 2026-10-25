@@ -47,10 +47,10 @@ inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape,
 		static_cast<unsigned char>(b)
 	};
 
-	int left = static_cast<int>(shape.min.x);
-	int top = window.getHeight() - static_cast<int>(shape.max.y);
-	int right = static_cast<int>(shape.max.x) - 1;
-	int bottom = window.getHeight() - static_cast<int>(shape.min.y) - 1;
+	int left = static_cast<int>(shape.min.x) - 1;
+	int top = static_cast<int>(shape.min.y) - 1;
+	int right = static_cast<int>(shape.max.x);
+	int bottom = static_cast<int>(shape.max.y);
 
 	if (right < left || bottom < top || thickness <= 0)
 	{
@@ -61,7 +61,7 @@ inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape,
 		{
 			if (x >= 0 && x < window.getWidth() && y >= 0 && y < window.getHeight())
 			{
-				window.draw(x, window.getHeight() + (shape.max.y - shape.min.y) - y, color);
+				window.draw(x, y, color);
 			}
 		};
 
