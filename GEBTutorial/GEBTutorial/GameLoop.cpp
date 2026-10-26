@@ -12,6 +12,13 @@ int GameLoop::Init()
     isRunning = true; // Variable to control the main loop's running state.
 
     quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(canvas.getWidth(), canvas.getHeight())));
+    /*tilemap = new Tilemap(
+        Vector2(16, 16),
+        Vector2(32, 32),
+        32,
+        Vector2(200, 200)
+    );
+    tilemap->Init("./assets/level.txt", "./assets/TileMapAtlas.rgba");*/
 
 	player = new Player(Vector2(100, 100), "./assets/Circle.png");
 	entities.Push(player);
@@ -87,6 +94,8 @@ void GameLoop::Draw()
     {
         canvas.draw(70, i, 255, 255, 255);
     }
+
+    //tilemap->Draw(canvas);
 
     /*image.load("./assets/Circle.png");
     for (int i = 0; i < image.width; i++)

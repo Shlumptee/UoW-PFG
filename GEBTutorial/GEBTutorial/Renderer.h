@@ -38,6 +38,51 @@ inline void Render_Image(GamesEngineeringBase::Window& window, Vector2 position,
 	}
 }
 
+inline void Render_Tile(GamesEngineeringBase::Window& window, int tileID, int sourceTileSize, Vector2 position, Vector2 size, const GamesEngineeringBase::Image& image)
+{
+	if (image.data == nullptr)
+	{
+		return;
+	}
+
+	int columns = image.width / sourceTileSize;
+
+	int xPos = (tileID % columns) * sourceTileSize;
+	int yPos = (tileID / columns) * sourceTileSize;
+
+	if (xPos + sourceTileSize > image.width || yPos + sourceTileSize > image.height)
+	{
+		return;
+	}
+
+	for (int y = 0; y < size.y; y++)
+	{
+		int screenY = position.y + y;
+
+		if (screenY < 0 || screenY >= window.getHeight())
+		{
+			continue;
+		}
+
+		for (int x = 0; x < size.x; x++)
+		{
+			int screenX = position.x + x;
+
+			if (screenX < 0 || screenX >= window.getWidth())
+			{
+				continue;
+			}
+
+			const unsigned int pixelIndex = ((yPos + (y * sourceTileSize) / size.y) * image.width + (xPos + (x * sourceTileSize) / size.x)) * image.channels;
+
+			if (image.channels == 3 || image.data[pixelIndex + 3] != 0)
+			{
+				window.draw(screenX, screenY, &image.data[pixelIndex]);
+			}
+		}
+	}
+}
+
 inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape, unsigned int r = 255, unsigned int g = 0, unsigned int b = 0, int thickness = 1)
 {
 	unsigned char color[3] = 
