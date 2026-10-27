@@ -9,10 +9,9 @@
 class Tilemap
 {
 public:
-	Tilemap(Vector2 _mapSize, Vector2 _tileSize, int _sourceTileSize, Vector2 _position);
+	Tilemap(Vector2 _mapSize, Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string mapFile, std::string imagePath);
 	~Tilemap();
 
-	void Init(std::string mapfile, std::string imagePath);
 	void Draw(GamesEngineeringBase::Window& window);
 
 	int GetTile(int row, int col) const;

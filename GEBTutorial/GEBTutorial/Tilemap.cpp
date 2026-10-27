@@ -3,16 +3,31 @@
 // Code taken and modified from an older C++ project that used tilemaps
 // Conversion isn't 1-to-1, so might be janky
 // Definitely isn't efficient either, should look at replacing with better version
-Tilemap::Tilemap(Vector2 _mapSize, Vector2 _tileSize, int _sourceTileSize, Vector2 _position)
+Tilemap::Tilemap(Vector2 _mapSize, Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string _mapFile, std::string _imagePath)
 {
 	mapSize = _mapSize;
 	tileSize = _tileSize;
 	sourceTileSize = _sourceTileSize;
 	position = _position;
 
-	map = new int[mapSize.x, mapSize.y];
 
-	
+	map = new int[mapSize.x * mapSize.y];
+
+	for (int i = 0; i < mapSize.x * mapSize.y; i++)
+	{
+		map[i] = 0;
+	}
+
+	LoadTilemap(_mapFile);
+
+	image.load(_imagePath);
+
+	if (image.data == nullptr)
+	{
+		std::cout << "Failed to load tile atlas: " << _imagePath << std::endl;
+
+		return;
+	}
 }
 
 Tilemap::~Tilemap()
@@ -20,15 +35,15 @@ Tilemap::~Tilemap()
 	delete[] map;
 }
 
-void Tilemap::Init(std::string mapfile, std::string imagePath)
-{
-	LoadTilemap(mapfile);
-
-	image.load(imagePath);
-}
-
 void Tilemap::Draw(GamesEngineeringBase::Window& window)
 {
+	if (image.data == nullptr)
+	{
+		std::cout << "Failed to load tile atlas" << std::endl;
+
+		return;
+	}
+
 	for (int row = 0; row < mapSize.y; row++)
 	{
 		for (int col = 0; col < mapSize.x; col++)
@@ -46,9 +61,16 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 {
 	std::ifstream tilemapStream(mapFile);
 
-	for (int row = 0; row < mapSize.y; row++)
+	if (!tilemapStream.is_open())
 	{
-		for (int col = 0; col < mapSize.x; col++)
+		std::cout << "Failed to open tilemap: " << mapFile << std::endl;
+
+		return;
+	}
+
+	for (int row = 0; row < mapSize.x; row++)
+	{
+		for (int col = 0; col < mapSize.y; col++)
 		{
 			int value;
 
@@ -66,8 +88,7 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 
 int Tilemap::GetTile(int row, int col) const
 {
-	if (row < 0 || row >= mapSize.y ||
-		col < 0 || col >= mapSize.x)
+	if (row < 0 || row >= mapSize.y || col < 0 || col >= mapSize.x)
 	{
 		return -1;
 	}
