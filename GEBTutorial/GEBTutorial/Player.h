@@ -29,9 +29,9 @@ public:
 		std::cout << "Player collided with another entity!" << std::endl;
 		SetPosition(boundingBox.min);
 	}
-	virtual void Draw(GamesEngineeringBase::Window& window) override
+	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera) override
 	{
-		VisualEntity::Draw(window);
+		VisualEntity::Draw(window, camera);
 		Render_Rect(window, boundingBox, GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 

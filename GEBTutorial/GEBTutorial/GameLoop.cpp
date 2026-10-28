@@ -32,6 +32,9 @@ int GameLoop::Init()
     entities.Push(new Enemy(Vector2(500, 100), "./assets/Enemy.png"));
     entities.Push(new Enemy(Vector2(800, 600), "./assets/Enemy.png"));
 
+    camera = new Camera(Vector2(canvas.getWidth(), canvas.getHeight()));
+    camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));
+
     return 1;
 }
 
@@ -78,6 +81,8 @@ void GameLoop::Update()
 	}
 
     collisionManager.Update(*quadtree, entities);
+
+    camera->Follow(*player);
 }
 
 void GameLoop::Draw()
@@ -114,7 +119,7 @@ void GameLoop::Draw()
 
 	for (int i = 0; i < entities.GetSize(); i++)
 	{
-		entities[i]->Draw(canvas);
+		entities[i]->Draw(canvas, *camera);
 	}
 }
 

@@ -3,6 +3,7 @@
 #include "GamesEngineeringBase.h"
 
 #include "Renderer.h"
+#include "Camera.h"
 #include "Vector2.h"
 
 class Entity
@@ -58,9 +59,12 @@ public:
 	{
 		isColliding = true;
 	}
-	virtual void Draw(GamesEngineeringBase::Window& window)
+	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera)
 	{
-		Render_Image(window, GetPosition(), image);
+		int screenX = GetPosition().x - camera.GetPosition().x;
+		int screenY = GetPosition().y - camera.GetPosition().y;
+
+		Render_Image(window, Vector2(screenX, screenY), image);
 	}
 	virtual const GamesEngineeringBase::Image& GetImage() const
 	{

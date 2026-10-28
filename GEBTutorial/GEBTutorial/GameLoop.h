@@ -5,6 +5,7 @@
 #include "Quadtree.h"
 #include "CollisionManager.h"
 #include "Tilemap.h"
+#include "Camera.h"
 
 class GameLoop
 {
@@ -29,6 +30,7 @@ private:
 	Quadtree* quadtree = nullptr;
 	CollisionManager collisionManager;
 	Tilemap* tilemap = nullptr;
+	Camera* camera = nullptr;
 
 	float deltaTime = 0.0f;
 
