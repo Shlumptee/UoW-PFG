@@ -5,14 +5,15 @@
 #include "GamesEngineeringBase.h"
 #include "Shape.h"
 #include "Renderer.h"
+#include "Camera.h"
 
 class Tilemap
 {
 public:
-	Tilemap(Vector2 _mapSize, Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string mapFile, std::string imagePath);
+	Tilemap(Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string mapFile, std::string imagePath);
 	~Tilemap();
 
-	void Draw(GamesEngineeringBase::Window& window);
+	void Draw(GamesEngineeringBase::Window& window, Camera& camera);
 
 	int GetTile(int row, int col) const;
 

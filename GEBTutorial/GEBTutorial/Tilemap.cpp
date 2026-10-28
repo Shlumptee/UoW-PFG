@@ -3,20 +3,11 @@
 // Code taken and modified from an older C++ project that used tilemaps
 // Conversion isn't 1-to-1, so might be janky
 // Definitely isn't efficient either, should look at replacing with better version
-Tilemap::Tilemap(Vector2 _mapSize, Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string _mapFile, std::string _imagePath)
+Tilemap::Tilemap(Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string _mapFile, std::string _imagePath)
 {
-	mapSize = _mapSize;
 	tileSize = _tileSize;
 	sourceTileSize = _sourceTileSize;
 	position = _position;
-
-
-	map = new int[mapSize.x * mapSize.y];
-
-	for (int i = 0; i < mapSize.x * mapSize.y; i++)
-	{
-		map[i] = 0;
-	}
 
 	LoadTilemap(_mapFile);
 
@@ -35,7 +26,7 @@ Tilemap::~Tilemap()
 	delete[] map;
 }
 
-void Tilemap::Draw(GamesEngineeringBase::Window& window)
+void Tilemap::Draw(GamesEngineeringBase::Window& window, Camera& camera)
 {
 	if (image.data == nullptr)
 	{
@@ -44,15 +35,15 @@ void Tilemap::Draw(GamesEngineeringBase::Window& window)
 		return;
 	}
 
-	for (int row = 0; row < mapSize.y; row++)
+	for (int row = 0; row < mapSize.x; row++)
 	{
-		for (int col = 0; col < mapSize.x; col++)
+		for (int col = 0; col < mapSize.y; col++)
 		{
-			int tileID = GetTile(row, col);
+			int tileID = GetTile(col, row);
 
-			Vector2 tilePosition(col * tileSize.x + position.x, row * tileSize.y + position.y);
+			Vector2 tilePosition(row * tileSize.x + position.x, col * tileSize.y + position.y);
 
-			Render_Tile(window, tileID, sourceTileSize, tilePosition, tileSize, image);
+			Render_Tile(window, tileID, sourceTileSize, tilePosition - camera.GetPosition(), tileSize, image);
 		}
 	}
 }
@@ -68,11 +59,25 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 		return;
 	}
 
+	int value;
+	tilemapStream >> value;
+	mapSize.x = value;
+	tilemapStream >> value;
+	mapSize.y = value;
+
+	std::cout << "Map size: x: " << mapSize.x << ", y: " << mapSize.y << std::endl;
+
+	map = new int[mapSize.x * mapSize.y];
+
+	for (int i = 0; i < mapSize.x * mapSize.y; i++)
+	{
+		map[i] = 0;
+	}
+
 	for (int row = 0; row < mapSize.x; row++)
 	{
 		for (int col = 0; col < mapSize.y; col++)
 		{
-			int value;
 
 			if (!(tilemapStream >> value))
 			{
@@ -81,7 +86,7 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 				return;
 			}
 
-			map[row * (int)mapSize.x + col] = value;
+			map[row * (int)mapSize.y + col] = value;
 		}
 	}
 }

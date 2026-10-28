@@ -68,6 +68,4 @@ void Camera::ToWorld()
 	{
 		position.y = maxY;
 	}
-
-	std::cout << "Camera Position: x: " << position.x << ", y: " << position.y << std::endl;
 }

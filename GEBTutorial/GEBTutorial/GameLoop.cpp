@@ -13,12 +13,10 @@ int GameLoop::Init()
 
     quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(canvas.getWidth(), canvas.getHeight())));
     tilemap = new Tilemap(
-        Vector2(16, 16),
         Vector2(32, 32),
         32,
         Vector2(200, 200),
-        "./assets/1.txt", "./assets/TileMapAtlas.png"
-    );
+        "./assets/Levels/3.txt", "./assets/TileMapAtlas.png");
 
 	player = new Player(Vector2(100, 100), "./assets/Circle.png");
 	entities.Push(player);
@@ -95,27 +93,7 @@ void GameLoop::Draw()
         }
     }
 
-    for (int i = 0; i < canvas.getHeight(); i++)
-    {
-        canvas.draw(70, i, 255, 255, 255);
-    }
-
-    tilemap->Draw(canvas);
-
-    /*image.load("./assets/Circle.png");
-    for (int i = 0; i < image.width; i++)
-    {
-        for (int j = 0; j < image.height; j++)
-        {
-            if (!image.alphaAt(i, j))
-            {
-                continue;
-            }
-
-            unsigned char* pixel = image.at(i, j);
-            canvas.draw(100 + i, 100 + j, red, green, blue);
-        }
-    }*/
+    tilemap->Draw(canvas, *camera);
 
 	for (int i = 0; i < entities.GetSize(); i++)
 	{
