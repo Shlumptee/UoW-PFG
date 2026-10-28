@@ -74,11 +74,10 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 		map[i] = 0;
 	}
 
-	for (int row = 0; row < mapSize.x; row++)
+	for (int col = 0; col < mapSize.y; col++)
 	{
-		for (int col = 0; col < mapSize.y; col++)
+		for (int row = 0; row < mapSize.x; row++)
 		{
-
 			if (!(tilemapStream >> value))
 			{
 				std::cout << "Invalid or incomplete tilemap: " << mapFile << std::endl;
@@ -86,10 +85,63 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 				return;
 			}
 
-			map[row * (int)mapSize.y + col] = value;
+			int maxStep;
+			tilemapStream >> maxStep;
+
+			for (int step = 0; step < maxStep; step++)
+			{
+				int currentRow = row + step;
+				map[currentRow + col * (int)mapSize.x] = value;
+			}
+
+			row += maxStep - 1;
 		}
 	}
 }
+
+// Old load without run length encoding
+//void Tilemap::LoadTilemap(std::string& mapFile)
+//{
+//	std::ifstream tilemapStream(mapFile);
+//
+//	if (!tilemapStream.is_open())
+//	{
+//		std::cout << "Failed to open tilemap: " << mapFile << std::endl;
+//
+//		return;
+//	}
+//
+//	int value;
+//	tilemapStream >> value;
+//	mapSize.x = value;
+//	tilemapStream >> value;
+//	mapSize.y = value;
+//
+//	std::cout << "Map size: x: " << mapSize.x << ", y: " << mapSize.y << std::endl;
+//
+//	map = new int[mapSize.x * mapSize.y];
+//
+//	for (int i = 0; i < mapSize.x * mapSize.y; i++)
+//	{
+//		map[i] = 0;
+//	}
+//
+//	for (int col = 0; col < mapSize.y; col++)
+//	{
+//		for (int row = 0; row < mapSize.x; row++)
+//		{
+//
+//			if (!(tilemapStream >> value))
+//			{
+//				std::cout << "Invalid or incomplete tilemap: " << mapFile << std::endl;
+//
+//				return;
+//			}
+//
+//			map[row + col * (int)mapSize.x] = value;
+//		}
+//	}
+//}
 
 int Tilemap::GetTile(int row, int col) const
 {

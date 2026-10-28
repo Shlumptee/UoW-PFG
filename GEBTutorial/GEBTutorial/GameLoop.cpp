@@ -16,7 +16,7 @@ int GameLoop::Init()
         Vector2(32, 32),
         32,
         Vector2(200, 200),
-        "./assets/Levels/3.txt", "./assets/TileMapAtlas.png");
+        "./assets/Levels/3 RLE.txt", "./assets/TileMapAtlas.png");
 
 	player = new Player(Vector2(100, 100), "./assets/Circle.png");
 	entities.Push(player);
