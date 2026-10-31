@@ -83,7 +83,7 @@ inline void Render_Tile(GamesEngineeringBase::Window& window, int tileID, int so
 	}
 }
 
-inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape, unsigned int r = 255, unsigned int g = 0, unsigned int b = 0, int thickness = 1)
+inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape, Vector2 cameraOffset, unsigned int r = 255, unsigned int g = 0, unsigned int b = 0, int thickness = 1)
 {
 	unsigned char color[3] = 
 	{
@@ -92,10 +92,10 @@ inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape,
 		static_cast<unsigned char>(b)
 	};
 
-	int left = static_cast<int>(shape.min.x) - 1;
-	int top = static_cast<int>(shape.min.y) - 1;
-	int right = static_cast<int>(shape.max.x);
-	int bottom = static_cast<int>(shape.max.y);
+	int left = static_cast<int>(shape.min.x - cameraOffset.x) - 1;
+	int top = static_cast<int>(shape.min.y - cameraOffset.y) - 1;
+	int right = static_cast<int>(shape.max.x - cameraOffset.x);
+	int bottom = static_cast<int>(shape.max.y - cameraOffset.y);
 
 	if (right < left || bottom < top || thickness <= 0)
 	{

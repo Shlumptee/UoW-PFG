@@ -5,6 +5,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Vector2.h"
+#include "Health.h"
 
 class Entity
 {
@@ -41,7 +42,7 @@ private:
 class VisualEntity : public PositionEntity
 {
 public:
-	VisualEntity() : PositionEntity({ 0, 0 })
+	VisualEntity() : PositionEntity({ 0, 0 }), health()
 	{
 
 	}
@@ -91,6 +92,10 @@ public:
 	{
 		return imagePath;
 	}
+	Health& GetHealth()
+	{
+		return health;
+	}
 	void SetImagePath(const std::string& _imagePath)
 	{
 		imagePath = _imagePath;
@@ -101,4 +106,6 @@ private:
 
 	std::string imagePath;
 	GamesEngineeringBase::Image image;
+
+	Health health;
 };

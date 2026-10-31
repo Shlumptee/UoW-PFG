@@ -11,7 +11,7 @@ int GameLoop::Init()
     canvas.create(1024, 768, "Blast'ems++");
     isRunning = true; // Variable to control the main loop's running state.
 
-    quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(canvas.getWidth(), canvas.getHeight())));
+    quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(1024*3, 768*3)));
     tilemap = new Tilemap(
         Vector2(32, 32),
         32,
@@ -29,6 +29,8 @@ int GameLoop::Init()
     entities.Push(new Enemy(Vector2(50, 100), "./assets/Enemy.png"));
     entities.Push(new Enemy(Vector2(500, 100), "./assets/Enemy.png"));
     entities.Push(new Enemy(Vector2(800, 600), "./assets/Enemy.png"));
+
+    entities.Push(new Enemy(Vector2(300, 850), "./assets/Enemy.png"));
 
     camera = new Camera(Vector2(canvas.getWidth(), canvas.getHeight()));
     camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));

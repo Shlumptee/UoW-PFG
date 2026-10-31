@@ -12,6 +12,7 @@ class Enemy : public VisualEntity
 public:
 	Enemy(const Vector2 position, std::string filePath) : VisualEntity(position, filePath)
 	{
+		GetHealth().SetMaxHealth(100.0f);
 	}
 
 	virtual void Update(float deltaTime) override
@@ -23,7 +24,7 @@ public:
 	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera) override
 	{
 		VisualEntity::Draw(window, camera);
-		Render_Rect(window, boundingBox, GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
+		Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
 private:

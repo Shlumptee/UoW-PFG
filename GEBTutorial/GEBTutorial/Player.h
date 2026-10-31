@@ -12,7 +12,7 @@ class Player : public VisualEntity
 public:
 	Player(const Vector2 position, std::string filePath) : VisualEntity(position, filePath)
 	{
-		std::cout << "Bounding Box: Min(" << boundingBox.min.x << ", " << boundingBox.min.y << "), Max(" << boundingBox.max.x << ", " << boundingBox.max.y << ")" << std::endl;
+		GetHealth().SetMaxHealth(100);
 	}
 
 	virtual void Update(float deltaTime) override
@@ -32,7 +32,7 @@ public:
 	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera) override
 	{
 		VisualEntity::Draw(window, camera);
-		Render_Rect(window, boundingBox, GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
+		Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
 	void SetInput(const Vector2& _inputAxis)
