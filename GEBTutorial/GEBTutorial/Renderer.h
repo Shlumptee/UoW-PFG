@@ -75,12 +75,52 @@ inline void Render_Tile(GamesEngineeringBase::Window& window, int tileID, int so
 
 			const unsigned int pixelIndex = ((yPos + (y * sourceTileSize) / size.y) * image.width + (xPos + (x * sourceTileSize) / size.x)) * image.channels;
 
-			if (image.channels == 3 || image.data[pixelIndex + 3] != 0)
+			if (image.channels != 4 || image.data[pixelIndex + 3] != 0)
 			{
 				window.draw(screenX, screenY, &image.data[pixelIndex]);
 			}
 		}
 	}
+}
+
+inline void Render_Character(GamesEngineeringBase::Window& window, const GamesEngineeringBase::Image& image, char character, Vector2 position, int tileSize = 32)
+{
+	if (image.data == nullptr)
+	{
+		return;
+	}
+	
+	if (character < 32 || character > 126)
+	{
+		return;
+	}
+
+	int tileID = static_cast<unsigned char>(character);
+
+	Render_Tile(window, tileID, tileSize, position, Vector2(tileSize, tileSize), image);
+}
+
+inline void Render_String(GamesEngineeringBase::Window& window, const GamesEngineeringBase::Image& image, const char* text, Vector2 position, int tileSize = 32)
+{
+	if (image.data == nullptr || text == nullptr)
+	{
+		return;
+	}
+
+	for (int i = 0; text[i] != '\0'; i++)
+	{
+		Render_Character(window, image, text[i], Vector2(position.x + i * tileSize, position.y), tileSize);
+	}
+}
+
+inline void Render_Number(GamesEngineeringBase::Window& window, const GamesEngineeringBase::Image& image, int number, Vector2 position, int tileSize = 32)
+{
+	if (image.data == nullptr)
+	{
+		return;
+	}
+	std::string string = std::to_string(number);
+	Render_String(window, image, string.c_str(), position, tileSize);
 }
 
 inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape, Vector2 cameraOffset, unsigned int r = 255, unsigned int g = 0, unsigned int b = 0, int thickness = 1)

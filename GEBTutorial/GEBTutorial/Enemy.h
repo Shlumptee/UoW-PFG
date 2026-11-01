@@ -58,7 +58,7 @@ public:
 			return;
 		}
 
-		SetPosition(previousPosition);
+		//SetPosition(previousPosition);
 
 		Player* player = dynamic_cast<Player*>(other);
 

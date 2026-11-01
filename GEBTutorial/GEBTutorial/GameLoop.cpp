@@ -34,6 +34,11 @@ int GameLoop::Init()
     camera = new Camera(Vector2(canvas.getWidth(), canvas.getHeight()));
     camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));
 
+    fontImage.load("./assets/text2.png");
+    std::cout << "Font width: " << fontImage.width << std::endl;
+    std::cout << "Font height: " << fontImage.height << std::endl;
+    std::cout << "Font channels: " << fontImage.channels << std::endl;
+
     return 1;
 }
 
@@ -71,6 +76,17 @@ void GameLoop::Update()
 {
 	deltaTime = timer.dt();
 
+    fpsCount++;
+    fpsTimer += deltaTime;
+
+    if (fpsTimer >= 1.0f)
+    {
+        fps = (int)(fpsCount / fpsTimer);
+
+        fpsCount = 0;
+        fpsTimer = 0.0f;
+    }
+
     quadtree->Clear();
 	for (int i = 0; i < entities.GetSize(); i++)
 	{
@@ -107,6 +123,8 @@ void GameLoop::Draw()
 	{
 		entities[i]->Draw(canvas, *camera);
 	}
+
+    Render_Number(canvas, fontImage, fps, Vector2(20, 20), 32);
 }
 
 void GameLoop::Destroy()

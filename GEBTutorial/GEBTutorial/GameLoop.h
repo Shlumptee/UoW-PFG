@@ -36,5 +36,11 @@ private:
 
 	GamesEngineeringBase::Timer timer;
 	Vector2 input{ 0, 0 };
+
+	GamesEngineeringBase::Image fontImage;
+
+	float fpsTimer;
+	int fpsCount;
+	int fps;
 };
 
