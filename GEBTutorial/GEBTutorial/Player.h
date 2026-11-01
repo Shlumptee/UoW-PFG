@@ -26,7 +26,9 @@ public:
 		}
 
 		previousPosition = GetPosition();
-		Move(inputAxis * moveSpeed * deltaTime);
+		Move(((inputAxis * moveSpeed) + GetKnockbackVelocity()) * deltaTime);
+		UpdateKnockback(deltaTime);
+
 		boundingBox.Set(GetBoundingBox());
 
 		if (meleeInput && !previousMeleeInput)
@@ -89,6 +91,9 @@ public:
 
 			if (quadtree.Intersects(attackBounds, target->GetBoundingBox()))
 			{
+				Vector2 direction(target->GetPosition().x - GetPosition().x, target->GetPosition().y - GetPosition().y);
+
+				target->ApplyKnockback(direction, 250.0f);
 				target->GetHealth().RemoveHealth(meleeDamage);
 
 				std::cout << "Enemy Hit! Health: " << target->GetHealth().GetCurrentHealth() << std::endl;

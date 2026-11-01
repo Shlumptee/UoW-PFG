@@ -67,6 +67,29 @@ public:
 
 		Render_Image(window, Vector2(screenX, screenY), image);
 	}
+
+	virtual void ApplyKnockback(Vector2 direction, float strength)
+	{
+		float length = direction.Length();
+
+		if (length == 0.0f)
+		{
+			return;
+		}
+
+		direction = direction * (1.0f / length);
+		knockbackVelocity = direction * strength;
+	}
+	void UpdateKnockback(float deltaTime)
+	{
+		float speed = knockbackVelocity.Length();
+		float knockbackReduction = knockbackDecay * deltaTime;
+
+		if (speed <= knockbackReduction)
+			knockbackVelocity.Set(0, 0);
+		else
+			knockbackVelocity = knockbackVelocity * ((speed - knockbackReduction) / speed);
+	}
 	virtual const GamesEngineeringBase::Image& GetImage() const
 	{
 		return image;
@@ -101,9 +124,21 @@ public:
 	{
 		return health;
 	}
+	float GetKnockbackDecay() const
+	{
+		return knockbackDecay;
+	}
+	Vector2 GetKnockbackVelocity() const
+	{
+		return knockbackVelocity;
+	}
 	void SetImagePath(const std::string& _imagePath)
 	{
 		imagePath = _imagePath;
+	}
+	void SetKnockbackDecay(float _knockbackDecay)
+	{
+		knockbackDecay = _knockbackDecay;
 	}
 
 private:
@@ -113,4 +148,6 @@ private:
 	GamesEngineeringBase::Image image;
 
 	Health health;
+	Vector2 knockbackVelocity;
+	float knockbackDecay = 600.0f;
 };

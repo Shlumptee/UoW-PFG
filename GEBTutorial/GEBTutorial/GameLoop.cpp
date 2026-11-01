@@ -20,17 +20,16 @@ int GameLoop::Init()
 
 	player = new Player(Vector2(100, 100), "./assets/Circle.png");
 	entities.Push(player);
+    entities.Push(new Enemy(Vector2(500, 300), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(600, 110), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(100, 600), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(100, 150), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(100, 50), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(50, 100), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(500, 100), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(800, 600), player, "./assets/Enemy.png"));
 
-    entities.Push(new Enemy(Vector2(500, 300), "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(600, 110), "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(100, 600), "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(100, 150), "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(100, 50), "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(50, 100), "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(500, 100), "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(800, 600), "./assets/Enemy.png"));
-
-    entities.Push(new Enemy(Vector2(300, 850), "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(300, 850), player, "./assets/Enemy.png"));
 
     camera = new Camera(Vector2(canvas.getWidth(), canvas.getHeight()));
     camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));

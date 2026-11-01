@@ -15,6 +15,11 @@ public:
 	{
 		GetHealth().SetMaxHealth(100.0f);
 	}
+	Enemy(const Vector2 position, Player* _player, std::string filePath) : VisualEntity(position, filePath)
+	{
+		GetHealth().SetMaxHealth(100.0f);
+		player = _player;
+	}
 
 	virtual void Update(float deltaTime) override
 	{
@@ -30,6 +35,18 @@ public:
 			}
 		}
 
+		Vector2 direction(player->GetPosition().x - GetPosition().x, player->GetPosition().y - GetPosition().y);
+		float distance = direction.Length();
+
+		if (distance > 0.0f)
+		{
+			direction = direction * (1.0f / distance);
+		}
+
+		previousPosition = GetPosition();
+		Move(((direction * moveSpeed) + GetKnockbackVelocity()) * deltaTime);
+		UpdateKnockback(deltaTime);
+
 		boundingBox.Set(GetBoundingBox());
 	}
 	virtual void OnCollision(VisualEntity* other) override
@@ -41,6 +58,8 @@ public:
 			return;
 		}
 
+		SetPosition(previousPosition);
+
 		Player* player = dynamic_cast<Player*>(other);
 
 		if (player == nullptr || damageTimer > 0)
@@ -48,6 +67,9 @@ public:
 			return;
 		}
 
+		Vector2 direction(player->GetPosition().x - GetPosition().x, player->GetPosition().y - GetPosition().y);
+
+		player->ApplyKnockback(direction, 250.0f);
 		player->GetHealth().RemoveHealth(damage);
 
 		damageTimer = damageCooldown;
@@ -65,11 +87,13 @@ public:
 		return true;
 	}
 private:
-	float moveSpeed = 128.0f;
+	float moveSpeed = 32.0f;
 	float damage = 10.0f;
 
 	float damageCooldown = 0.75f;
 	float damageTimer = 0.0f;
 
 	Rect boundingBox{ Vector2(GetPosition().x , GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y + GetHeight()) };
+	Player* player = nullptr;
+	Vector2 previousPosition;
 };
