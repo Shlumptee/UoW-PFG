@@ -210,12 +210,16 @@ public:
 
 		return count;
 	}
+	void SetBounds(Rect _bounds)
+	{
+		bounds = _bounds;
+	}
 	Rect GetBounds() const
 	{
 		return bounds;
 	}
 private:
-	int maxObjects = 8;
+	int maxObjects = 10;
 	int maxLevels = 5;
 
 	int level;

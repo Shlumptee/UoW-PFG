@@ -6,6 +6,7 @@
 
 #include "Shape.h"
 #include "Vector2.h"
+#include "Quadtree.h"
 
 class Player : public VisualEntity
 {
@@ -19,15 +20,26 @@ public:
 	{
 		VisualEntity::Update(deltaTime);
 
-		boundingBox.Set(GetBoundingBox());
+		if (inputAxis.x != 0 || inputAxis.y != 0)
+		{
+			orientation = inputAxis;
+		}
+
+		previousPosition = GetPosition();
 		Move(inputAxis * moveSpeed * deltaTime);
+		boundingBox.Set(GetBoundingBox());
+
+		if (meleeInput && !previousMeleeInput)
+		{
+			requestingMelee = true;
+		}
+
+		previousMeleeInput = meleeInput;
 	}
 	virtual void OnCollision(VisualEntity* other) override
 	{
 		VisualEntity::OnCollision(other);
-
-		std::cout << "Player collided with another entity!" << std::endl;
-		SetPosition(boundingBox.min);
+		SetPosition(previousPosition);
 	}
 	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera) override
 	{
@@ -35,9 +47,76 @@ public:
 		Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
+	virtual void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities)
+	{
+		Rect attackBounds;
+		Rect playerBounds = GetBoundingBox();
+
+		if (orientation.x > 0)
+		{
+			// Attacking to the right
+			attackBounds.Set({ playerBounds.max.x, playerBounds.min.y }, { playerBounds.max.x + meleeRange, playerBounds.max.y });
+		}
+		else if (orientation.x < 0)
+		{
+			// Attacking to the left
+			attackBounds.Set({ playerBounds.min.x - meleeRange, playerBounds.min.y }, { playerBounds.min.x, playerBounds.max.y });
+		}
+		else if (orientation.y > 0)
+		{
+			// Attacking downwards
+			attackBounds.Set({ playerBounds.min.x, playerBounds.max.y }, { playerBounds.max.x, playerBounds.max.y + meleeRange});
+		}
+		else
+		{
+			// Attacking upwards
+			attackBounds.Set({ playerBounds.min.x, playerBounds.min.y - meleeRange }, { playerBounds.max.x, playerBounds.min.y });
+		}
+
+		for (int i = 0; i < entities.GetSize(); i++)
+		{
+			VisualEntity* target = entities[i];
+
+			if (target == nullptr || target == this)
+			{
+				continue;
+			}
+
+			if (!target->CanBeDamaged())
+			{
+				continue;
+			}
+
+			if (quadtree.Intersects(attackBounds, target->GetBoundingBox()))
+			{
+				target->GetHealth().RemoveHealth(meleeDamage);
+
+				std::cout << "Enemy Hit! Health: " << target->GetHealth().GetCurrentHealth() << std::endl;
+			}
+		}
+	}
+
+	virtual bool CanBeDamaged() const override
+	{
+		return true;
+	}
+	bool ConsumeMeleeRequest()
+	{
+		if (!requestingMelee)
+		{
+			return false;
+		}
+
+		requestingMelee = false;
+		return true;
+	}
 	void SetInput(const Vector2& _inputAxis)
 	{
 		inputAxis = _inputAxis;
+	}
+	void SetMeleeInput(bool _meleeInput)
+	{
+		meleeInput = _meleeInput;
 	}
 	const Vector2& GetInput() const
 	{
@@ -46,8 +125,16 @@ public:
 	
 private:
 	float moveSpeed = 128.0f;
+	float meleeDamage = 25.0f;
+	float meleeRange = 32.0f;
+
+	bool requestingMelee = false;
+	bool previousMeleeInput = false;
+	bool meleeInput = false;
 
 	Vector2 inputAxis;
+	Vector2 orientation = { 0, 1 };
+	Vector2 previousPosition;
 
 	Rect boundingBox{ Vector2(GetPosition().x , GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y + GetHeight())};
 };

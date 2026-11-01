@@ -65,6 +65,7 @@ void GameLoop::HandleInput()
     }
 
     player->SetInput(input);
+    player->SetMeleeInput(canvas.keyPressed('E'));
 }
 
 void GameLoop::Update()
@@ -83,6 +84,12 @@ void GameLoop::Update()
     collisionManager.Update(*quadtree, entities);
 
     camera->Follow(*player);
+    quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (canvas.getWidth() / 2), camera->GetPosition().y - (canvas.getHeight() / 2)), Vector2(camera->GetPosition().x + (canvas.getWidth() / 2), camera->GetPosition().y + (canvas.getHeight() / 2))));
+
+    if (player->ConsumeMeleeRequest())
+    {
+        player->MeleeAttack(*quadtree, entities);
+    }
 }
 
 void GameLoop::Draw()

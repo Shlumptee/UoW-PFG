@@ -72,6 +72,11 @@ public:
 		return image;
 	}
 
+	virtual bool CanBeDamaged() const
+	{
+		return false;
+	}
+
 	virtual int GetWidth() const
 	{
 		return image.width;
