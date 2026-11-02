@@ -34,6 +34,7 @@ public:
 	void SetState(GameState state)
 	{
 		currentState = state;
+		ChangeScreen();
 	}
 	GameState GetState() const
 	{
@@ -50,8 +51,8 @@ private:
 	GameState currentState;
 	GameScreen* currentScreen = nullptr;
 
-	GameplayScreen gameplayScreen{ window };
-	MainMenuScreen mainMenuScreen{ window };
+	GameplayScreen gameplayScreen{ window, *this };
+	MainMenuScreen mainMenuScreen{ window, *this };
 
 	bool isRunning = false;
 	float deltaTime = 0.0f;

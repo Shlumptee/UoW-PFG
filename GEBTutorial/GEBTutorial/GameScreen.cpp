@@ -17,7 +17,7 @@ void MainMenuScreen::HandleInput()
 {
     if (window.keyPressed('P'))
     {
-        //gameManager.SetState(GameState::Game);
+        gameManager.SetState(GameState::Game);
     }
 }
 
@@ -141,13 +141,13 @@ void GameplayScreen::Update(float deltaTime)
 void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
 {
 	// Draw gameplay screen
-    for (int i = 0; i < window.getHeight(); i++)
+    /*for (int i = 0; i < window.getHeight(); i++)
     {
         for (int j = 0; j < window.getWidth(); j++)
         {
             window.draw(j, i, 0, 0, 128);
         }
-    }
+    }*/
 
     tilemap->Draw(window, *camera);
 

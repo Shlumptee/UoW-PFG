@@ -8,7 +8,7 @@ class GameManager;
 class GameScreen
 {
 public:
-	GameScreen(GamesEngineeringBase::Window& _window) : window(_window)
+	GameScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : window(_window), gameManager(_gameManager)
 	{
 
 	}
@@ -21,12 +21,13 @@ public:
 	virtual void Destroy() = 0;
 protected:
 	GamesEngineeringBase::Window& window;
+	GameManager& gameManager;
 };
 
 class MainMenuScreen : public GameScreen
 {
 public:
-	MainMenuScreen(GamesEngineeringBase::Window& _window) : GameScreen(_window)
+	MainMenuScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
 	{
 	}
 	void Init() override;
@@ -41,7 +42,7 @@ private:
 class GameplayScreen : public GameScreen
 {
 public:
-	GameplayScreen(GamesEngineeringBase::Window& _window) : GameScreen(_window)
+	GameplayScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
 	{
 	}
 	void Init() override;
@@ -72,7 +73,7 @@ private:
 class GameplayInfScreen : public GameScreen
 {
 public:
-	GameplayInfScreen(GamesEngineeringBase::Window& _window) : GameScreen(_window)
+	GameplayInfScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
 	{
 
 	}
@@ -87,7 +88,7 @@ public:
 class TallyScreen : public GameScreen
 {
 public:
-	TallyScreen(GamesEngineeringBase::Window& _window) : GameScreen(_window)
+	TallyScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
 	{
 
 	}
