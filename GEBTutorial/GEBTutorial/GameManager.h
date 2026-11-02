@@ -51,6 +51,7 @@ private:
 	GameScreen* currentScreen = nullptr;
 
 	GameplayScreen gameplayScreen{ window };
+	MainMenuScreen mainMenuScreen{ window };
 
 	bool isRunning = false;
 	float deltaTime = 0.0f;

@@ -8,6 +8,7 @@
 void MainMenuScreen::Init()
 {
 	// Initialize main menu screen
+	std::cout << "Main Menu Screen Initialized" << std::endl;
 }
 
 void MainMenuScreen::HandleInput()
@@ -23,6 +24,19 @@ void MainMenuScreen::Update(float deltaTime)
 void MainMenuScreen::Draw(GamesEngineeringBase::Window& window)
 {
 	// Draw main menu screen
+    for (int i = 0; i < window.getHeight(); i++)
+    {
+        for (int j = 0; j < window.getWidth(); j++)
+        {
+            window.draw(j, i, 128, 0, 0);
+        }
+    }
+}
+
+void MainMenuScreen::Destroy()
+{
+	// Clean up resources for main menu screen
+	std::cout << "Main Menu Screen Destroyed" << std::endl;
 }
 #pragma endregion
 

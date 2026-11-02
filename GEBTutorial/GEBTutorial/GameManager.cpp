@@ -17,6 +17,31 @@ void GameManager::HandleInput()
 	{
 		isRunning = false;
 	}
+    if (window.keyPressed('1'))
+    {
+		currentState = GameState::MainMenu;
+		ChangeScreen();
+	}
+	else if (window.keyPressed('2'))
+	{
+		currentState = GameState::Game;
+		ChangeScreen();
+	}
+	else if (window.keyPressed('3'))
+	{
+		currentState = GameState::GameInfinite;
+		ChangeScreen();
+	}
+	else if (window.keyPressed('4'))
+	{
+		currentState = GameState::TallyScreen;
+		ChangeScreen();
+	}
+	else if (window.keyPressed('5'))
+	{
+		currentState = GameState::GameOver;
+		ChangeScreen();
+    }
 	if (currentScreen != nullptr)
 	{
 		currentScreen->HandleInput();
@@ -51,10 +76,14 @@ void GameManager::Destroy()
 
 void GameManager::ChangeScreen()
 {
+	if (currentScreen != nullptr)
+	{
+		currentScreen->Destroy();
+	}
     switch (currentState)
     {
     case GameState::MainMenu:
-        // activeScreen = &mainMenuScreen;
+        currentScreen = &mainMenuScreen;
         break;
 
     case GameState::Game:
@@ -62,15 +91,15 @@ void GameManager::ChangeScreen()
         break;
 
     case GameState::GameInfinite:
-        // activeScreen = &infiniteGameplayScreen;
+        // currentScreen = &infiniteGameplayScreen;
         break;
 
     case GameState::TallyScreen:
-        // activeScreen = &tallyScreen;
+        // currentScreen = &tallyScreen;
         break;
 
     case GameState::GameOver:
-        // activeScreen = &gameOverScreen;
+        // currentScreen = &gameOverScreen;
         break;
     }
 

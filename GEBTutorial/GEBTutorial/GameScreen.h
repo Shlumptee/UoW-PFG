@@ -16,6 +16,7 @@ public:
 	virtual void HandleInput() = 0;
 	virtual void Update(float deltaTime) = 0;
 	virtual void Draw(GamesEngineeringBase::Window& window) = 0;
+	virtual void Destroy() = 0;
 protected:
 	GamesEngineeringBase::Window& window;
 };
@@ -30,6 +31,7 @@ public:
 	void HandleInput() override;
 	void Update(float deltaTime) override;
 	void Draw(GamesEngineeringBase::Window& window) override;
+	void Destroy() override;
 };
 
 class GameplayScreen : public GameScreen
@@ -42,6 +44,7 @@ public:
 	void HandleInput() override;
 	void Update(float deltaTime) override;
 	void Draw(GamesEngineeringBase::Window& window) override;
+	void Destroy() override;
 private:
 	DynamicArray<VisualEntity*> entities;
 	Player* player = nullptr;
@@ -60,6 +63,4 @@ private:
 	float fpsTimer;
 	int fpsCount;
 	int fps;
-
-	void Destroy();
 };
