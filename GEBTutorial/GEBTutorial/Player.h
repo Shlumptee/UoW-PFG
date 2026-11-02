@@ -127,6 +127,10 @@ public:
 	{
 		return inputAxis;
 	}
+	int GetCurrentHealth()
+	{
+		return GetHealth().GetCurrentHealth();
+	}
 	
 private:
 	float moveSpeed = 128.0f;

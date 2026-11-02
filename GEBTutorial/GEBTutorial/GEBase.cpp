@@ -1,34 +1,34 @@
 #include <iostream>
 #include "GamesEngineeringBase.h" // Include the GamesEngineeringBase header
 
-#include "GameLoop.h"
+#include "GameManager.h"
 
 int main() {
-    GameLoop* gameLoop = new GameLoop();
+    GameManager gameManager;
 
-    if (gameLoop->Init() < 1)
+    if (gameManager.Init() < 1)
     {
         return 0;
     }
 
-    while (gameLoop->isRunning)
+    while (gameManager.IsRunning())
     {
         // Check for input (key presses or window events)
-        gameLoop->HandleInput();
+        gameManager.HandleInput();
 
         // Clear the window for the next frame rendering
-        gameLoop->canvas.clear();
+        gameManager.GetWindow().clear();
 
         // Update game logic
-        gameLoop->Update();
+        gameManager.Update();
 
         // Draw();
-        gameLoop->Draw();
+        gameManager.Draw();
 
         // Display the frame on the screen. This must be called once the frame is finished in order to display the frame.
-        gameLoop->canvas.present();
+        gameManager.GetWindow().present();
     }
     
-	gameLoop->Destroy();
+	gameManager.Destroy();
     return 0;
 }

@@ -5,6 +5,10 @@
 #include "Enemy.h"
 #include "Renderer.h"
 
+// OLD - being replaced by GameManager.cpp
+// I wanted to leave this as-is for now just in case anything goes horrifically wrong
+// Should delete once GameManager.cpp is fully implemented and working
+
 int GameLoop::Init()
 {
     // Create a canvas window with dimensions 1024x768 and title “Tiles"
@@ -35,9 +39,6 @@ int GameLoop::Init()
     camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));
 
     fontImage.load("./assets/text2.png");
-    std::cout << "Font width: " << fontImage.width << std::endl;
-    std::cout << "Font height: " << fontImage.height << std::endl;
-    std::cout << "Font channels: " << fontImage.channels << std::endl;
 
     return 1;
 }
@@ -96,6 +97,15 @@ void GameLoop::Update()
         quadtree->Insert(object);
 	}
 
+    /*for (int i = 0; i < entities.GetSize(); i++)
+    {
+        DynamicArray<CollisionObject> candidates;
+
+        quadtree->Retrieve(candidates, entities[i]->GetBoundingBox());
+
+        std::cout << "Entity " << i << " candidates: " << candidates.GetSize() << "\n";
+    }*/
+
     collisionManager.Update(*quadtree, entities);
 
     camera->Follow(*player);
@@ -124,7 +134,8 @@ void GameLoop::Draw()
 		entities[i]->Draw(canvas, *camera);
 	}
 
-    Render_Number(canvas, fontImage, fps, Vector2(20, 20), 32);
+    Render_Number(canvas, fontImage, fps, Vector2(1024 - 32*3.5f, 768 - 32), 32);
+	Render_Number(canvas, fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
 }
 
 void GameLoop::Destroy()

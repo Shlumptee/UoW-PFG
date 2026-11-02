@@ -23,6 +23,13 @@ public:
 
 	virtual void Update(float deltaTime) override
 	{
+		if (GetHealth().GetCurrentHealth() <= 0)
+		{
+			SetPosition(Vector2(-1000, -1000));
+			boundingBox.Set(GetBoundingBox());
+			return;
+		}
+
 		VisualEntity::Update(deltaTime);
 
 		if (damageTimer > 0)
@@ -58,7 +65,7 @@ public:
 			return;
 		}
 
-		//SetPosition(previousPosition);
+		SetPosition(previousPosition);
 
 		Player* player = dynamic_cast<Player*>(other);
 

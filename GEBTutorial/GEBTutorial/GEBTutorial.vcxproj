@@ -141,6 +141,8 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GameLoop.cpp" />
+    <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameScreen.cpp" />
     <ClCompile Include="GEBase.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Tilemap.cpp" />
@@ -151,6 +153,8 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GameLoop.h" />
+    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameScreen.h" />
     <ClInclude Include="GamesEngineeringBase.h" />
     <ClInclude Include="Health.h" />
     <ClInclude Include="Player.h" />

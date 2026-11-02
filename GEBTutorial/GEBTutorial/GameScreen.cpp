@@ -1,0 +1,173 @@
+#include <iostream>
+
+#include "GameScreen.h"
+#include "Enemy.h"
+
+#pragma region MainMenuScreen
+
+void MainMenuScreen::Init()
+{
+	// Initialize main menu screen
+}
+
+void MainMenuScreen::HandleInput()
+{
+	// Handle input for main menu screen
+}
+
+void MainMenuScreen::Update(float deltaTime)
+{
+	// Update main menu screen
+}
+
+void MainMenuScreen::Draw(GamesEngineeringBase::Window& window)
+{
+	// Draw main menu screen
+}
+#pragma endregion
+
+#pragma region GameplayScreen
+
+void GameplayScreen::Init()
+{
+	// Initialize gameplay screen
+    quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(1024 * 3, 768 * 3)));
+    tilemap = new Tilemap(
+        Vector2(32, 32),
+        32,
+        Vector2(200, 200),
+        "./assets/Levels/3 RLE.txt", "./assets/TileMapAtlas.png");
+
+    player = new Player(Vector2(100, 100), "./assets/Circle.png");
+    entities.Push(player);
+    entities.Push(new Enemy(Vector2(500, 300), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(600, 110), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(100, 600), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(400, 150), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(100, 500), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(500, 200), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(500, 100), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(800, 600), player, "./assets/Enemy.png"));
+
+    entities.Push(new Enemy(Vector2(300, 850), player, "./assets/Enemy.png"));
+
+    camera = new Camera(Vector2(window.getWidth(), window.getHeight()));
+    camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));
+
+    fontImage.load("./assets/text2.png");
+}
+
+void GameplayScreen::HandleInput()
+{
+	// Handle input for gameplay screen
+    // Check for input (key presses or window events)
+    input.Set(0, 0);
+    if (window.keyPressed('A'))
+    {
+        input.x -= 1.0f;
+    }
+    if (window.keyPressed('D'))
+    {
+        input.x += 1.0f;
+    }
+    if (window.keyPressed('S'))
+    {
+        input.y += 1.0f;
+    }
+    if (window.keyPressed('W'))
+    {
+        input.y -= 1.0f;
+    }
+
+    player->SetInput(input);
+    player->SetMeleeInput(window.keyPressed('E'));
+}
+
+void GameplayScreen::Update(float deltaTime)
+{
+	// Update gameplay screen
+    fpsCount++;
+    fpsTimer += deltaTime;
+
+    if (fpsTimer >= 1.0f)
+    {
+        fps = (int)(fpsCount / fpsTimer);
+
+        fpsCount = 0;
+        fpsTimer = 0.0f;
+    }
+
+    quadtree->Clear();
+    for (int i = 0; i < entities.GetSize(); i++)
+    {
+        entities[i]->Update(deltaTime);
+
+        CollisionObject object(entities[i], entities[i]->GetBoundingBox());
+        quadtree->Insert(object);
+    }
+
+    /*for (int i = 0; i < entities.GetSize(); i++)
+    {
+        DynamicArray<CollisionObject> candidates;
+
+        quadtree->Retrieve(candidates, entities[i]->GetBoundingBox());
+
+        std::cout << "Entity " << i << " candidates: " << candidates.GetSize() << "\n";
+    }*/
+
+    collisionManager.Update(*quadtree, entities);
+
+    camera->Follow(*player);
+    quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
+
+    if (player->ConsumeMeleeRequest())
+    {
+        player->MeleeAttack(*quadtree, entities);
+    }
+}
+
+void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
+{
+	// Draw gameplay screen
+    for (int i = 0; i < window.getHeight(); i++)
+    {
+        for (int j = 0; j < window.getWidth(); j++)
+        {
+            window.draw(j, i, 0, 0, 128);
+        }
+    }
+
+    tilemap->Draw(window, *camera);
+
+    for (int i = 0; i < entities.GetSize(); i++)
+    {
+        entities[i]->Draw(window, *camera);
+    }
+
+    Render_Number(window, fontImage, fps, Vector2(1024 - 32 * 3.5f, 768 - 32), 32);
+    Render_Number(window, fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
+}
+
+void GameplayScreen::Destroy()
+{
+	// Clean up resources for gameplay screen
+    for (int i = 0; i < entities.GetSize(); i++)
+    {
+        delete entities[i];
+    }
+    entities.Clear();
+
+    if (quadtree != nullptr)
+    {
+        delete quadtree;
+        quadtree = nullptr;
+    }
+
+    player = nullptr;
+}
+
+#pragma endregion
+
+#pragma region TallyScreen
+
+#pragma endregion
