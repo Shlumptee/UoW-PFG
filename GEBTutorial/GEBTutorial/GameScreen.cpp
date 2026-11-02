@@ -9,8 +9,7 @@
 void MainMenuScreen::Init()
 {
 	// Initialize main menu screen
-    fontImage.load("./assets/text2.png");
-	std::cout << "Main Menu Screen Initialized" << std::endl;
+    GameScreen::Init();
 }
 
 void MainMenuScreen::HandleInput()
@@ -29,15 +28,9 @@ void MainMenuScreen::Update(float deltaTime)
 void MainMenuScreen::Draw(GamesEngineeringBase::Window& window)
 {
 	// Draw main menu screen
-    for (int i = 0; i < window.getHeight(); i++)
-    {
-        for (int j = 0; j < window.getWidth(); j++)
-        {
-            window.draw(j, i, 128, 0, 0);
-        }
-    }
+    Render_Background(window, 184, 143, 67);
 
-    Render_String(window, fontImage, "Main Menu", { 350, 25 });
+    Render_String(window, GetFontImage(), "Main Menu", {350, 25});
 }
 
 void MainMenuScreen::Destroy()
@@ -52,6 +45,8 @@ void MainMenuScreen::Destroy()
 void GameplayScreen::Init()
 {
 	// Initialize gameplay screen
+	GameScreen::Init();
+
     quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(1024 * 3, 768 * 3)));
     tilemap = new Tilemap(
         Vector2(32, 32),
@@ -74,8 +69,6 @@ void GameplayScreen::Init()
 
     camera = new Camera(Vector2(window.getWidth(), window.getHeight()));
     camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));
-
-    fontImage.load("./assets/text2.png");
 }
 
 void GameplayScreen::HandleInput()
@@ -148,6 +141,7 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
             window.draw(j, i, 0, 0, 128);
         }
     }*/
+    Render_Background(window);
 
     tilemap->Draw(window, *camera);
 
@@ -157,8 +151,9 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
     }
 
     //Render_String(window, fontImage, "sjdnsjdjsdhjsdhsjdhjsdhjsdhjshdjhdsjhshdjsd", Vector2(0, 0));
-    Render_Number(window, fontImage, fps, Vector2(1024 - 32 * 3.5f, 768 - 32), 32);
-    Render_Number(window, fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
+	std::string fpsString = "FPS:" + std::to_string(fps);
+    Render_String(window, GetFontImage(), fpsString.c_str(), Vector2(1024 - 32 * 8, 768 - 32), 32);
+    Render_Number(window, GetFontImage(), (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
 }
 
 void GameplayScreen::Destroy()
@@ -181,6 +176,111 @@ void GameplayScreen::Destroy()
 
 #pragma endregion
 
+#pragma region GameplayScreenInfinite
+
+void GameplayScreenInfinite::Init()
+{
+	// Initialize gameplay screen infinite
+}
+
+void GameplayScreenInfinite::HandleInput()
+{
+	// Handle input for gameplay screen infinite
+}
+
+void GameplayScreenInfinite::Update(float deltaTime)
+{
+	// Update gameplay screen infinite
+}
+
+void GameplayScreenInfinite::Draw(GamesEngineeringBase::Window& window)
+{
+	// Draw gameplay screen infinite
+}
+
+void GameplayScreenInfinite::Destroy()
+{
+	// Clean up resources for gameplay screen infinite
+}
+
+#pragma endregion
+
 #pragma region TallyScreen
+
+void TallyScreen::Init()
+{
+	// Initialize tally screen
+	GameScreen::Init();
+}
+
+void TallyScreen::HandleInput()
+{
+	// Handle input for tally screen
+	if (window.keyPressed('M'))
+	{
+		gameManager.SetState(GameState::MainMenu);
+	}
+	if (window.keyPressed(VK_SPACE))
+	{
+		gameManager.SetState(GameState::Game);
+	}
+}
+
+void TallyScreen::Update(float deltaTime)
+{
+	// Update tally screen
+}
+
+void TallyScreen::Draw(GamesEngineeringBase::Window& window)
+{
+	// Draw tally screen
+	Render_String(window, GetFontImage(), "Tally Screen", {350, 25});
+}
+
+void TallyScreen::Destroy()
+{
+	// Clean up resources for tally screen
+}
+
+#pragma endregion
+
+#pragma region GameOverScreen
+
+void GameOverScreen::Init()
+{
+	// Initialize game over screen
+	GameScreen::Init();
+}
+
+void GameOverScreen::HandleInput()
+{
+	// Handle input for game over screen
+	if (window.keyPressed('M'))
+	{
+		gameManager.SetState(GameState::MainMenu);
+	}
+	if (window.keyPressed('R'))
+	{
+		gameManager.SetState(GameState::Game);
+	}
+}
+
+void GameOverScreen::Update(float deltaTime)
+{
+	// Update game over screen
+}
+
+void GameOverScreen::Draw(GamesEngineeringBase::Window& window)
+{
+	// Draw game over screen
+	Render_Background(window, 128, 0, 0);
+
+	Render_String(window, GetFontImage(), "Game Over!", { 350, 25 });
+}
+
+void GameOverScreen::Destroy()
+{
+	// Clean up resources for game over screen
+}
 
 #pragma endregion

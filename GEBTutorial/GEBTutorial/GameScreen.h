@@ -14,14 +14,26 @@ public:
 	}
 	virtual ~GameScreen() = default;
 
-	virtual void Init() = 0;
+	virtual void Init()
+	{
+		fontImage.load("./assets/text2.png");
+	}
 	virtual void HandleInput() = 0;
 	virtual void Update(float deltaTime) = 0;
 	virtual void Draw(GamesEngineeringBase::Window& window) = 0;
 	virtual void Destroy() = 0;
+
+	GamesEngineeringBase::Image& GetFontImage()
+	{
+		return fontImage;
+	}
+
 protected:
 	GamesEngineeringBase::Window& window;
 	GameManager& gameManager;
+
+private:
+	GamesEngineeringBase::Image fontImage;
 };
 
 class MainMenuScreen : public GameScreen
@@ -35,8 +47,6 @@ public:
 	void Update(float deltaTime) override;
 	void Draw(GamesEngineeringBase::Window& window) override;
 	void Destroy() override;
-private:
-	GamesEngineeringBase::Image fontImage;
 };
 
 class GameplayScreen : public GameScreen
@@ -63,17 +73,15 @@ private:
 	GamesEngineeringBase::Timer timer;
 	Vector2 input{ 0, 0 };
 
-	GamesEngineeringBase::Image fontImage;
-
 	float fpsTimer = 0.0f;
 	int fpsCount = 0;
 	int fps = 0;
 };
 
-class GameplayInfScreen : public GameScreen
+class GameplayScreenInfinite : public GameScreen
 {
 public:
-	GameplayInfScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
+	GameplayScreenInfinite(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
 	{
 
 	}
@@ -91,6 +99,20 @@ public:
 	TallyScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
 	{
 
+	}
+
+	void Init() override;
+	void HandleInput() override;
+	void Update(float deltaTime) override;
+	void Draw(GamesEngineeringBase::Window& window) override;
+	void Destroy() override;
+};
+
+class GameOverScreen : public GameScreen
+{
+public:
+	GameOverScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : GameScreen(_window, _gameManager)
+	{
 	}
 
 	void Init() override;

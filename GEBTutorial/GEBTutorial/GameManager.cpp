@@ -91,15 +91,15 @@ void GameManager::ChangeScreen()
         break;
 
     case GameState::GameInfinite:
-        // currentScreen = &infiniteGameplayScreen;
+        currentScreen = &gameplayScreenInfinite;
         break;
 
     case GameState::TallyScreen:
-        // currentScreen = &tallyScreen;
+        currentScreen = &tallyScreen;
         break;
 
     case GameState::GameOver:
-        // currentScreen = &gameOverScreen;
+        currentScreen = &gameOverScreen;
         break;
     }
 

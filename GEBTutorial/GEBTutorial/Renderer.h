@@ -3,6 +3,7 @@
 #include "GamesEngineeringBase.h"
 #include "Shape.h"
 
+// CHANGE TO SAME METHOD AS RENDER_TILE
 inline void Render_Image(GamesEngineeringBase::Window& window, Vector2 position, const GamesEngineeringBase::Image& image)
 {
 	if (image.data == nullptr)
@@ -30,7 +31,7 @@ inline void Render_Image(GamesEngineeringBase::Window& window, Vector2 position,
 
 			const unsigned int pixelIndex = (h * image.width + w) * image.channels;
 
-			if (image.channels != 4 || image.data[pixelIndex + 3] != 0)
+			if (image.channels == 4 && image.data[pixelIndex + 3] != 0)
 			{
 				window.draw(x, y, &image.data[pixelIndex]);
 			}
@@ -38,6 +39,7 @@ inline void Render_Image(GamesEngineeringBase::Window& window, Vector2 position,
 	}
 }
 
+// Better version of previous Render_Tile, this one gets the backbuffer directly to save on time. Receiving a faster tilemap render after this change.
 inline void Render_Tile(GamesEngineeringBase::Window& window, int tileID, int sourceTileSize, Vector2 position, Vector2 size, const GamesEngineeringBase::Image& image)
 {
 	if (image.data == nullptr)
@@ -50,34 +52,50 @@ inline void Render_Tile(GamesEngineeringBase::Window& window, int tileID, int so
 	int xPos = (tileID % row) * size.x;
 	int yPos = (tileID / row) * size.y;
 
-	/*if (xPos + size.x > image.width || yPos + size.y > image.height)
+	unsigned char* backBuffer = window.backBuffer();
+	int windowWidth = window.getWidth();
+	int windowHeight = window.getHeight();
+
+	int startX = position.x;
+	int startY = position.y;
+	int endX = startX + size.x;
+	int endY = startY + size.y;
+
+	if (startX < 0)
 	{
-		return;
-	}*/
-
-	for (int y = 0; y < size.y; y++)
+		startX = 0;
+	}
+	if (startY < 0)
 	{
-		int screenY = position.y + y;
+		startY = 0;
+	}
+	if (endX > windowWidth)
+	{
+		endX = windowWidth;
+	}
+	if (endY > windowHeight)
+	{
+		endY = windowHeight;
+	}
 
-		if (screenY < 0 || screenY >= window.getHeight())
+	for (int y = startY; y < endY; y++)
+	{
+		int yDiff = y - position.y;
+		int screenY = yPos + (yDiff * size.y) / size.y;
+
+		for (int x = startX; x < endX; x++)
 		{
-			continue;
-		}
+			int xDiff = x - position.x;
+			int screenX = xPos + (xDiff * size.x) / size.x;
 
-		for (int x = 0; x < size.x; x++)
-		{
-			int screenX = position.x + x;
+			const unsigned int pixelIndex = (screenY * image.width + screenX) * image.channels;
 
-			if (screenX < 0 || screenX >= window.getWidth())
+			if (image.channels == 4 && image.data[pixelIndex + 3] != 0)
 			{
-				continue;
-			}
-
-			const unsigned int pixelIndex = ((yPos + y) * image.width + (xPos + x)) * image.channels;
-
-			if (image.channels != 4 || image.data[pixelIndex + 3] != 0)
-			{
-				window.draw(screenX, screenY, &image.data[pixelIndex]);
+				unsigned int bufferIndex = ((y * windowWidth) + x) * 3;
+				backBuffer[bufferIndex] = image.data[pixelIndex];
+				backBuffer[bufferIndex + 1] = image.data[pixelIndex + 1];
+				backBuffer[bufferIndex + 2] = image.data[pixelIndex + 2];
 			}
 		}
 	}
@@ -124,6 +142,22 @@ inline void Render_Number(GamesEngineeringBase::Window& window, const GamesEngin
 	}
 	std::string string = std::to_string(number);
 	Render_String(window, image, string.c_str(), position, tileSize);
+}
+
+inline void Render_Background(GamesEngineeringBase::Window& window, unsigned int r = 0, unsigned int g = 0, unsigned int b = 128)
+{
+
+	for (int y = 0; y < window.getHeight(); y++)
+	{
+		for (int x = 0; x < window.getWidth(); x++)
+		{
+			unsigned char* backBuffer = window.backBuffer() + (y * window.getWidth() + x) * 3;
+
+			backBuffer[0] = static_cast<unsigned char>(r);
+			backBuffer[1] = static_cast<unsigned char>(g);
+			backBuffer[2] = static_cast<unsigned char>(b);
+		}
+	}
 }
 
 inline void Render_Rect(GamesEngineeringBase::Window& window, const Rect& shape, Vector2 cameraOffset, unsigned int r = 255, unsigned int g = 0, unsigned int b = 0, int thickness = 1)

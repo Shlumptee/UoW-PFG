@@ -52,7 +52,10 @@ private:
 	GameScreen* currentScreen = nullptr;
 
 	GameplayScreen gameplayScreen{ window, *this };
+	GameplayScreenInfinite gameplayScreenInfinite{ window, *this };
 	MainMenuScreen mainMenuScreen{ window, *this };
+	TallyScreen tallyScreen{ window, *this };
+	GameOverScreen gameOverScreen{ window, *this };
 
 	bool isRunning = false;
 	float deltaTime = 0.0f;
