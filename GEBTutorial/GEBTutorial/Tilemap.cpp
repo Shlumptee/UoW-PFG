@@ -39,7 +39,7 @@ void Tilemap::Draw(GamesEngineeringBase::Window& window, Camera& camera)
 	{
 		for (int col = 0; col < mapSize.y; col++)
 		{
-			int tileID = GetTile(col, row);
+			int tileID = GetTile(row, col);
 
 			Vector2 tilePosition(row * tileSize.x + position.x, col * tileSize.y + position.y);
 
@@ -145,10 +145,10 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 
 int Tilemap::GetTile(int row, int col) const
 {
-	if (row < 0 || row >= mapSize.y || col < 0 || col >= mapSize.x)
+	if (row < 0 || row >= mapSize.x || col < 0 || col >= mapSize.y)
 	{
 		return -1;
 	}
 
-	return map[row * (int)mapSize.x + col];
+	return map[row + col * (int)mapSize.x];
 }

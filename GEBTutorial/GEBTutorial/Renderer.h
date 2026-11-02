@@ -30,7 +30,7 @@ inline void Render_Image(GamesEngineeringBase::Window& window, Vector2 position,
 
 			const unsigned int pixelIndex = (h * image.width + w) * image.channels;
 
-			if (image.channels == 3 || image.data[pixelIndex + 3] != 0)
+			if (image.channels != 4 || image.data[pixelIndex + 3] != 0)
 			{
 				window.draw(x, y, &image.data[pixelIndex]);
 			}
@@ -45,15 +45,15 @@ inline void Render_Tile(GamesEngineeringBase::Window& window, int tileID, int so
 		return;
 	}
 
-	int columns = image.width / sourceTileSize;
+	int row = image.width / size.x;
 
-	int xPos = (tileID % columns) * sourceTileSize;
-	int yPos = (tileID / columns) * sourceTileSize;
+	int xPos = (tileID % row) * size.x;
+	int yPos = (tileID / row) * size.y;
 
-	if (xPos + sourceTileSize > image.width || yPos + sourceTileSize > image.height)
+	/*if (xPos + size.x > image.width || yPos + size.y > image.height)
 	{
 		return;
-	}
+	}*/
 
 	for (int y = 0; y < size.y; y++)
 	{
@@ -73,7 +73,7 @@ inline void Render_Tile(GamesEngineeringBase::Window& window, int tileID, int so
 				continue;
 			}
 
-			const unsigned int pixelIndex = ((yPos + (y * sourceTileSize) / size.y) * image.width + (xPos + (x * sourceTileSize) / size.x)) * image.channels;
+			const unsigned int pixelIndex = ((yPos + y) * image.width + (xPos + x)) * image.channels;
 
 			if (image.channels != 4 || image.data[pixelIndex + 3] != 0)
 			{
@@ -96,6 +96,9 @@ inline void Render_Character(GamesEngineeringBase::Window& window, const GamesEn
 	}
 
 	int tileID = static_cast<unsigned char>(character);
+	int row = image.width / tileSize;
+	int xPos = (tileID % row) * tileSize;
+	int yPos = (tileID / row) * tileSize;
 
 	Render_Tile(window, tileID, tileSize, position, Vector2(tileSize, tileSize), image);
 }

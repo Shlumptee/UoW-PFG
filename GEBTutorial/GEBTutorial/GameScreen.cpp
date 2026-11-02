@@ -2,18 +2,23 @@
 
 #include "GameScreen.h"
 #include "Enemy.h"
+#include "GameManager.h"
 
 #pragma region MainMenuScreen
 
 void MainMenuScreen::Init()
 {
 	// Initialize main menu screen
+    fontImage.load("./assets/text2.png");
 	std::cout << "Main Menu Screen Initialized" << std::endl;
 }
 
 void MainMenuScreen::HandleInput()
 {
-	// Handle input for main menu screen
+    if (window.keyPressed('P'))
+    {
+        //gameManager.SetState(GameState::Game);
+    }
 }
 
 void MainMenuScreen::Update(float deltaTime)
@@ -31,6 +36,8 @@ void MainMenuScreen::Draw(GamesEngineeringBase::Window& window)
             window.draw(j, i, 128, 0, 0);
         }
     }
+
+    Render_String(window, fontImage, "Main Menu", { 350, 25 });
 }
 
 void MainMenuScreen::Destroy()
@@ -120,15 +127,6 @@ void GameplayScreen::Update(float deltaTime)
         quadtree->Insert(object);
     }
 
-    /*for (int i = 0; i < entities.GetSize(); i++)
-    {
-        DynamicArray<CollisionObject> candidates;
-
-        quadtree->Retrieve(candidates, entities[i]->GetBoundingBox());
-
-        std::cout << "Entity " << i << " candidates: " << candidates.GetSize() << "\n";
-    }*/
-
     collisionManager.Update(*quadtree, entities);
 
     camera->Follow(*player);
@@ -158,6 +156,7 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
         entities[i]->Draw(window, *camera);
     }
 
+    //Render_String(window, fontImage, "sjdnsjdjsdhjsdhsjdhjsdhjsdhjshdjhdsjhshdjsd", Vector2(0, 0));
     Render_Number(window, fontImage, fps, Vector2(1024 - 32 * 3.5f, 768 - 32), 32);
     Render_Number(window, fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
 }

@@ -3,6 +3,8 @@
 #include "GameLoop.h"
 #include "GamesEngineeringBase.h"
 
+class GameManager;
+
 class GameScreen
 {
 public:
@@ -32,6 +34,8 @@ public:
 	void Update(float deltaTime) override;
 	void Draw(GamesEngineeringBase::Window& window) override;
 	void Destroy() override;
+private:
+	GamesEngineeringBase::Image fontImage;
 };
 
 class GameplayScreen : public GameScreen
@@ -60,7 +64,37 @@ private:
 
 	GamesEngineeringBase::Image fontImage;
 
-	float fpsTimer;
-	int fpsCount;
-	int fps;
+	float fpsTimer = 0.0f;
+	int fpsCount = 0;
+	int fps = 0;
+};
+
+class GameplayInfScreen : public GameScreen
+{
+public:
+	GameplayInfScreen(GamesEngineeringBase::Window& _window) : GameScreen(_window)
+	{
+
+	}
+
+	void Init() override;
+	void HandleInput() override;
+	void Update(float deltaTime) override;
+	void Draw(GamesEngineeringBase::Window& window) override;
+	void Destroy() override;
+};
+
+class TallyScreen : public GameScreen
+{
+public:
+	TallyScreen(GamesEngineeringBase::Window& _window) : GameScreen(_window)
+	{
+
+	}
+
+	void Init() override;
+	void HandleInput() override;
+	void Update(float deltaTime) override;
+	void Draw(GamesEngineeringBase::Window& window) override;
+	void Destroy() override;
 };

@@ -219,7 +219,7 @@ public:
 		return bounds;
 	}
 private:
-	int maxObjects = 8;
+	int maxObjects = 6;
 	int maxLevels = 5;
 
 	int level;
