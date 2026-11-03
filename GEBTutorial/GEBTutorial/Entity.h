@@ -106,7 +106,7 @@ public:
 		case TileType::Pit:
 			return false;
 		default:
-			return false;
+			return true;
 		}
 	}
 

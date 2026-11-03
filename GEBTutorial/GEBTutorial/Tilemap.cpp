@@ -104,14 +104,25 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 bool Tilemap::TileMapCollision(const Rect& bounds, const VisualEntity& entity) const
 {
 	// Calculate the tile indices that the bounds occupy
-	// Small bug with this code, bounds extend out one tile on the left and top edges, need to find a fix
-	int leftTile = ((bounds.min.x - position.x) / tileSize.x);
-    int rightTile = ((bounds.max.x - position.x) / tileSize.x);
 
-    int topTile = ((bounds.min.y - position.y) / tileSize.y);
-    int bottomTile = ((bounds.max.y - position.y) / tileSize.y);
+	// Stuff to check if the entity is actually within the map (otherwise it will think of the top and left edges as colliding with a wall)
+	float mapLeft = position.x;
+	float mapRight = position.x + mapSize.x * tileSize.x;
+	float mapTop = position.y;
+	float mapBottom = position.y + mapSize.y * tileSize.y;
 
-	for (int col = topTile; col <= bottomTile; col++)
+	if (bounds.max.x <= mapLeft || bounds.min.x >= mapRight || bounds.max.y <= mapTop || bounds.min.y >= mapBottom)
+	{
+		return true;
+	}
+
+	int leftTile = (int)((bounds.min.x - position.x) / tileSize.x);
+    int rightTile = (int)((bounds.max.x - position.x) / tileSize.x);
+
+    int topTile = (int)((bounds.min.y - position.y) / tileSize.y);
+    int bottomTile = (int)((bounds.max.y - position.y) / tileSize.y);
+
+	for (int col = bottomTile; col >= topTile; col--)
 	{
 		for (int row = leftTile; row <= rightTile; row++)
 		{

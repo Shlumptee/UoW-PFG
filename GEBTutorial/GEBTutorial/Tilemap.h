@@ -22,6 +22,7 @@ class Tilemap
 public:
 	Tilemap() = default;
 	Tilemap(Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string mapFile, std::string imagePath);
+	Tilemap(Vector2 _tileSize, int _sourceTileSize, Vector2 _position, Vector2 _mapSize, int* _map, const std::string& _imagePath);
 	~Tilemap();
 
 	void Draw(GamesEngineeringBase::Window& window, Camera& camera);
@@ -46,8 +47,7 @@ private:
 
 class InfiniteTilemap : public Tilemap
 {
-	InfiniteTilemap(Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string mapFile, std::string imagePath)
-		: Tilemap(_tileSize, _sourceTileSize, _position, mapFile, imagePath)
+	InfiniteTilemap()
 	{
 	}
 };
