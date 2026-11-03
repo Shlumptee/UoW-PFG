@@ -100,12 +100,14 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 	}
 }
 
+// Taken from older C++ project that used tilemap collision, also somewhat jank but at least uses AABB collision detection
 bool Tilemap::TileMapCollision(const Rect& bounds, const VisualEntity& entity) const
 {
-	int leftTile = (int)(bounds.min.x - position.x / tileSize.x);
-	int rightTile = (int)((bounds.max.x - 1 - position.x) / tileSize.x);
-	int topTile = (int)(bounds.min.y - position.y / tileSize.y);
-	int bottomTile = (int)((bounds.max.y - 1 - position.y) / tileSize.y);
+	int leftTile = ((bounds.min.x - position.x) / tileSize.x);
+    int rightTile = ((bounds.max.x - position.x) / tileSize.x);
+
+    int topTile = ((bounds.min.y - position.y) / tileSize.y);
+    int bottomTile = ((bounds.max.y - position.y) / tileSize.y);
 
 	for (int col = topTile; col <= bottomTile; col++)
 	{
@@ -115,17 +117,20 @@ bool Tilemap::TileMapCollision(const Rect& bounds, const VisualEntity& entity) c
 
 			if (tileID == -1)
 			{
+				//std::cout << "Tilemap collision check out of bounds" << std::endl;
 				continue;
 			}
 
 			TileType tileType = GetTileType(tileID);
 
-			if (!entity.CanTraverseTile(tileType))
+			if (!entity.TileInteraction(tileType))
 			{
+				//std::cout << "Collision with tile: " << tileID << std::endl;
 				return false;
 			}
 		}
 	}
+	//std::cout << "No collision" << std::endl;
 	return true;
 }
 

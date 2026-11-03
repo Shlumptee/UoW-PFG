@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Vector2.h"
 #include "Health.h"
+#include "Tilemap.h"
 
 class Entity
 {
@@ -51,8 +52,7 @@ public:
 		imagePath = _imagePath;
 		image.load(imagePath);
 	}
-
-	virtual void Update(float deltaTime)
+	virtual void Update(float deltaTime, Tilemap& tilemap)
 	{
 		isColliding = false;
 	}
@@ -90,6 +90,49 @@ public:
 		else
 			knockbackVelocity = knockbackVelocity * ((speed - knockbackReduction) / speed);
 	}
+
+	// Get what tiles the entity can interact with based off of type
+	virtual bool TileInteraction(TileType tile) const
+	{
+		switch (tile)
+		{
+		case TileType::Floor:
+			return true;
+		case TileType::Empty:
+			return true;
+
+		case TileType::Wall:
+			return false;
+		case TileType::Pit:
+			return false;
+		default:
+			return false;
+		}
+	}
+
+	// Move the entity based on the tilemap and its bounding box
+	void TileMove(const Vector2& movement, float deltaTime, const Tilemap& tilemap)
+	{
+		// Split horizontal and vertical movement (NEED TO DO THIS FOR QUADTREE COLLISIONS)
+		Vector2 originalposition = GetPosition();
+		
+		Move(Vector2(movement.x * deltaTime, 0));
+
+		if (!tilemap.TileMapCollision(GetBoundingBox(), *this))
+		{
+			SetPosition(originalposition);
+		}
+		
+		Vector2 horizontalPosition = GetPosition();
+
+		Move(Vector2(0, movement.y * deltaTime));
+
+		if (!tilemap.TileMapCollision(GetBoundingBox(), *this))
+		{
+			SetPosition(horizontalPosition);
+		}
+	}
+
 	virtual const GamesEngineeringBase::Image& GetImage() const
 	{
 		return image;

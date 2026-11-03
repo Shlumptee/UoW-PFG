@@ -21,7 +21,7 @@ public:
 		player = _player;
 	}
 
-	virtual void Update(float deltaTime) override
+	virtual void Update(float deltaTime, Tilemap& tilemap) override
 	{
 		if (GetHealth().GetCurrentHealth() <= 0)
 		{
@@ -30,7 +30,7 @@ public:
 			return;
 		}
 
-		VisualEntity::Update(deltaTime);
+		VisualEntity::Update(deltaTime, tilemap);
 
 		if (damageTimer > 0)
 		{
@@ -51,7 +51,9 @@ public:
 		}
 
 		previousPosition = GetPosition();
-		Move(((direction * moveSpeed) + GetKnockbackVelocity()) * deltaTime);
+		Vector2 movement = (direction * moveSpeed) + GetKnockbackVelocity();
+		TileMove(movement, deltaTime, tilemap);
+
 		UpdateKnockback(deltaTime);
 
 		boundingBox.Set(GetBoundingBox());

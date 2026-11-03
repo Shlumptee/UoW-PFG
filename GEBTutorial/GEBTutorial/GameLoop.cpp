@@ -91,7 +91,7 @@ void GameLoop::Update()
     quadtree->Clear();
 	for (int i = 0; i < entities.GetSize(); i++)
 	{
-		entities[i]->Update(deltaTime);
+		entities[i]->Update(deltaTime, *tilemap);
 
         CollisionObject object(entities[i], entities[i]->GetBoundingBox());
         quadtree->Insert(object);

@@ -17,17 +17,20 @@ public:
 		GetHealth().SetMaxHealth(100);
 	}
 
-	virtual void Update(float deltaTime) override
+	virtual void Update(float deltaTime, Tilemap& tilemap) override
 	{
-		VisualEntity::Update(deltaTime);
+		VisualEntity::Update(deltaTime, tilemap);
 
 		if (inputAxis.x != 0 || inputAxis.y != 0)
 		{
 			orientation = inputAxis;
 		}
 
+
 		previousPosition = GetPosition();
-		Move(((inputAxis * moveSpeed) + GetKnockbackVelocity()) * deltaTime);
+		Vector2 movement = (inputAxis * moveSpeed) + GetKnockbackVelocity();
+		TileMove(movement, deltaTime, tilemap);
+
 		UpdateKnockback(deltaTime);
 
 		boundingBox.Set(GetBoundingBox());
@@ -167,10 +170,10 @@ private:
 
 class PlayerWarrior : public Player
 {
-	void Update(float deltaTime) override
+	void Update(float deltaTime, Tilemap& tilemap) override
 	{
 		// Implement specific update logic for PlayerWarrior
-		Player::Update(deltaTime);
+		Player::Update(deltaTime, tilemap);
 	}
 };
 
