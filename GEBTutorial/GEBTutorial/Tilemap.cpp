@@ -1,4 +1,5 @@
 #include "Tilemap.h"
+#include "Entity.h"
 
 // Code taken and modified from an older C++ project that used tilemaps
 // Conversion isn't 1-to-1, so might be janky
@@ -99,6 +100,35 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 	}
 }
 
+bool Tilemap::TileMapCollision(const Rect& bounds, const VisualEntity& entity) const
+{
+	int leftTile = (int)(bounds.min.x - position.x / tileSize.x);
+	int rightTile = (int)((bounds.max.x - 1 - position.x) / tileSize.x);
+	int topTile = (int)(bounds.min.y - position.y / tileSize.y);
+	int bottomTile = (int)((bounds.max.y - 1 - position.y) / tileSize.y);
+
+	for (int col = topTile; col <= bottomTile; col++)
+	{
+		for (int row = leftTile; row <= rightTile; row++)
+		{
+			int tileID = GetTile(row, col);
+
+			if (tileID == -1)
+			{
+				continue;
+			}
+
+			TileType tileType = GetTileType(tileID);
+
+			if (!entity.CanTraverseTile(tileType))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 // Old load without run length encoding
 //void Tilemap::LoadTilemap(std::string& mapFile)
 //{
@@ -151,4 +181,19 @@ int Tilemap::GetTile(int row, int col) const
 	}
 
 	return map[row + col * (int)mapSize.x];
+}
+
+TileType Tilemap::GetTileType(int tileID) const
+{
+	switch (tileID)
+	{
+	case 0:
+		return TileType::Floor;
+	case 1:
+		return TileType::Wall;
+	case 2:
+		return TileType::Pit;
+	default:
+		return TileType::Empty;
+	}
 }

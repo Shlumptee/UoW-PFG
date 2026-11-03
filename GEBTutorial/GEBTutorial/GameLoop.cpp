@@ -113,7 +113,7 @@ void GameLoop::Update()
 
     if (player->ConsumeMeleeRequest())
     {
-        player->MeleeAttack(*quadtree, entities);
+        //player->MeleeAttack(*quadtree, entities);
     }
 }
 

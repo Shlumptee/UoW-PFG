@@ -7,6 +7,7 @@
 #include "Shape.h"
 #include "Vector2.h"
 #include "Quadtree.h"
+#include "ScoreManager.h"
 
 class Player : public VisualEntity
 {
@@ -49,7 +50,7 @@ public:
 		Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
-	virtual void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities)
+	virtual void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager)
 	{
 		Rect attackBounds;
 		Rect playerBounds = GetBoundingBox();
@@ -94,9 +95,25 @@ public:
 				Vector2 direction(target->GetPosition().x - GetPosition().x, target->GetPosition().y - GetPosition().y);
 
 				target->ApplyKnockback(direction, 250.0f);
+
+				bool wasAlive = target->GetHealth().IsDead();
+				int previousHealth = target->GetHealth().GetCurrentHealth();
+
 				target->GetHealth().RemoveHealth(meleeDamage);
 
-				std::cout << "Enemy Hit! Health: " << target->GetHealth().GetCurrentHealth() << std::endl;
+				int damageDealt = previousHealth - target->GetHealth().GetCurrentHealth();
+
+				if (damageDealt > 0)
+				{
+					scoreManager.AddScore(damageDealt * 0.75f);
+				}
+				if (!wasAlive && target->GetHealth().IsDead())
+				{
+					std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+					scoreManager.AddKill(150);
+				}
+
+				//std::cout << "Enemy Hit! Health: " << target->GetHealth().GetCurrentHealth() << std::endl;
 			}
 		}
 	}

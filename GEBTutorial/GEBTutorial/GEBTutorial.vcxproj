@@ -160,6 +160,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Quadtree.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Tilemap.h" />
     <ClInclude Include="Vector2.h" />

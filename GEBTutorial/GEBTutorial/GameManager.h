@@ -2,6 +2,7 @@
 
 #include "GamesEngineeringBase.h"
 #include "GameScreen.h"
+#include "ScoreManager.h"
 
 
 enum class GameState
@@ -44,10 +45,15 @@ public:
 	{
 		return window;
 	}
+	ScoreManager& GetScoreManager()
+	{
+		return scoreManager;
+	}
 
 private:
 	GamesEngineeringBase::Window window;
 	GamesEngineeringBase::Timer timer;
+
 	GameState currentState;
 	GameScreen* currentScreen = nullptr;
 
@@ -56,6 +62,8 @@ private:
 	MainMenuScreen mainMenuScreen{ window, *this };
 	TallyScreen tallyScreen{ window, *this };
 	GameOverScreen gameOverScreen{ window, *this };
+
+	ScoreManager scoreManager;
 
 	bool isRunning = false;
 	float deltaTime = 0.0f;

@@ -23,6 +23,24 @@ public:
 	virtual void Draw(GamesEngineeringBase::Window& window) = 0;
 	virtual void Destroy() = 0;
 
+	void UpdateFPSCounter(float deltaTime)
+	{
+		fpsCount++;
+		fpsTimer += deltaTime;
+		if (fpsTimer >= 1.0f)
+		{
+			fps = (int)(fpsCount / fpsTimer);
+			fpsCount = 0;
+			fpsTimer = 0.0f;
+		}
+	}
+
+	void RenderFPSCounter(GamesEngineeringBase::Window& window)
+	{
+		std::string fpsString = "FPS:" + std::to_string(fps);
+		Render_String(window, fontImage, fpsString.c_str(), Vector2(1024 - 32 * 8, 768 - 32), 32);
+	}
+
 	GamesEngineeringBase::Image& GetFontImage()
 	{
 		return fontImage;
@@ -34,6 +52,10 @@ protected:
 
 private:
 	GamesEngineeringBase::Image fontImage;
+
+	float fpsTimer;
+	int fpsCount;
+	int fps;
 };
 
 class MainMenuScreen : public GameScreen
@@ -72,10 +94,6 @@ private:
 
 	GamesEngineeringBase::Timer timer;
 	Vector2 input{ 0, 0 };
-
-	float fpsTimer = 0.0f;
-	int fpsCount = 0;
-	int fps = 0;
 };
 
 class GameplayScreenInfinite : public GameScreen
@@ -106,6 +124,15 @@ public:
 	void Update(float deltaTime) override;
 	void Draw(GamesEngineeringBase::Window& window) override;
 	void Destroy() override;
+
+private:
+	int score = 0;
+	int kills = 0;
+	float timeAlive = 0.0f;
+
+	std::string scoreString;
+	std::string killsString;
+	std::string timeAliveString;
 };
 
 class GameOverScreen : public GameScreen
