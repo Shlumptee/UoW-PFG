@@ -109,6 +109,15 @@ public:
 	void Update(float deltaTime) override;
 	void Draw(GamesEngineeringBase::Window& window) override;
 	void Destroy() override;
+private:
+	DynamicArray<VisualEntity*> entities;
+	Player* player = nullptr;
+	Quadtree* quadtree = nullptr;
+	CollisionManager collisionManager;
+	Tilemap* tilemap = nullptr;
+	Camera* camera = nullptr;
+
+	Vector2 input{ 0, 0 };
 };
 
 class TallyScreen : public GameScreen

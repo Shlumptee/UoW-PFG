@@ -69,8 +69,8 @@ void GameplayScreen::Init()
 
     entities.Push(new Enemy(Vector2(300, 850), player, "./assets/Enemy.png"));
 
-    camera = new Camera(Vector2(window.getWidth(), window.getHeight()));
-    camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));
+    camera = new Camera({ 0, 0 }, Vector2(window.getWidth(), window.getHeight()));
+    camera->SetWorldBounds({ 0, 0 }, Vector2(1024.0f * 2, 768.0f * 2));
 }
 
 void GameplayScreen::HandleInput()
@@ -173,18 +173,81 @@ void GameplayScreen::Destroy()
 
 void GameplayScreenInfinite::Init()
 {
-	// Initialize gameplay screen infinite
+    GameScreen::Init();
+    // Initialize gameplay screen infinite
+    quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(1024 * 3, 768 * 3)));
+    tilemap = new Tilemap(
+        Vector2(32, 32),
+        32,
+        Vector2(200, 200),
+        "./assets/Levels/3 RLE.txt", "./assets/TileMapAtlas.png");
+
+    player = new Player(Vector2(100, 100), "./assets/Circle.png");
+    entities.Push(player);
+    entities.Push(new Enemy(Vector2(500, 300), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(600, 110), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(100, 600), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(400, 150), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(100, 500), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(500, 200), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(500, 100), player, "./assets/Enemy.png"));
+    entities.Push(new Enemy(Vector2(800, 600), player, "./assets/Enemy.png"));
+
+    entities.Push(new Enemy(Vector2(300, 850), player, "./assets/Enemy.png"));
+
+    camera = new Camera({ 0, 0 }, Vector2(window.getWidth(), window.getHeight()));
+    camera->SetWorldBounds({ -10000, -10000 }, { 10000, 10000 });
 }
 
 void GameplayScreenInfinite::HandleInput()
 {
 	// Handle input for gameplay screen infinite
+    input.Set(0, 0);
+    if (window.keyPressed('A'))
+    {
+        input.x -= 1.0f;
+    }
+    if (window.keyPressed('D'))
+    {
+        input.x += 1.0f;
+    }
+    if (window.keyPressed('S'))
+    {
+        input.y += 1.0f;
+    }
+    if (window.keyPressed('W'))
+    {
+        input.y -= 1.0f;
+    }
+
+    player->SetInput(input);
+    player->SetMeleeInput(window.keyPressed('E'));
 }
 
 void GameplayScreenInfinite::Update(float deltaTime)
 {
 	// Update gameplay screen infinite
     UpdateFPSCounter(deltaTime);
+    gameManager.GetScoreManager().Update(deltaTime);
+
+    quadtree->Clear();
+    for (int i = 0; i < entities.GetSize(); i++)
+    {
+        entities[i]->Update(deltaTime, *tilemap);
+
+        CollisionObject object(entities[i], entities[i]->GetBoundingBox());
+        quadtree->Insert(object);
+    }
+
+    collisionManager.Update(*quadtree, entities);
+
+    camera->Follow(*player);
+    quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
+
+    if (player->ConsumeMeleeRequest())
+    {
+        player->MeleeAttack(*quadtree, entities, gameManager.GetScoreManager());
+    }
 }
 
 void GameplayScreenInfinite::Draw(GamesEngineeringBase::Window& window)
@@ -192,13 +255,32 @@ void GameplayScreenInfinite::Draw(GamesEngineeringBase::Window& window)
 	// Draw gameplay screen infinite
     Render_Background(window);
 
-    Render_Number(window, GetFontImage(), 100, Vector2(32, 0), 32);
+    tilemap->Draw(window, *camera);
+
+    for (int i = 0; i < entities.GetSize(); i++)
+    {
+        entities[i]->Draw(window, *camera);
+    }
     RenderFPSCounter(window);
+    Render_Number(window, GetFontImage(), (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
 }
 
 void GameplayScreenInfinite::Destroy()
 {
 	// Clean up resources for gameplay screen infinite
+    for (int i = 0; i < entities.GetSize(); i++)
+    {
+        delete entities[i];
+    }
+    entities.Clear();
+
+    if (quadtree != nullptr)
+    {
+        delete quadtree;
+        quadtree = nullptr;
+    }
+
+    player = nullptr;
 }
 
 #pragma endregion

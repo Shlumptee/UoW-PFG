@@ -67,6 +67,20 @@ public:
 			return;
 		}
 
+		Player* player = dynamic_cast<Player*>(other);
+
+		if (player != nullptr && damageTimer <= 0)
+		{
+			damageTimer = damageCooldown;
+
+			Vector2 direction(player->GetPosition().x - GetPosition().x, player->GetPosition().y - GetPosition().y);
+
+			player->ApplyKnockback(direction, 250.0f);
+			player->GetHealth().RemoveHealth(damage);
+
+			std::cout << "Player hit! Health: " << player->GetHealth().GetCurrentHealth() << std::endl;
+		}
+
 		Rect otherBoundingBox = other->GetBoundingBox();
 		Vector2 currentPosition = GetPosition();
 
@@ -109,24 +123,6 @@ public:
 		}
 
 		SetPosition(currentPosition);
-
-		std::cout << "Enemy collided with " << other->GetImagePath() << std::endl;
-
-		Player* player = dynamic_cast<Player*>(other);
-
-		if (player == nullptr || damageTimer > 0)
-		{
-			return;
-		}
-
-		Vector2 direction(player->GetPosition().x - GetPosition().x, player->GetPosition().y - GetPosition().y);
-
-		//player->ApplyKnockback(direction, 250.0f);
-		player->GetHealth().RemoveHealth(damage);
-
-		damageTimer = damageCooldown;
-
-		std::cout << "Player hit! Health: " << player->GetHealth().GetCurrentHealth() << std::endl;
 	}
 	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera) override
 	{

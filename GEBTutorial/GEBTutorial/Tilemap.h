@@ -20,6 +20,7 @@ enum class TileType
 class Tilemap
 {
 public:
+	Tilemap() = default;
 	Tilemap(Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string mapFile, std::string imagePath);
 	~Tilemap();
 
@@ -41,4 +42,12 @@ private:
 	Vector2 position;
 
 	GamesEngineeringBase::Image image;
+};
+
+class InfiniteTilemap : public Tilemap
+{
+	InfiniteTilemap(Vector2 _tileSize, int _sourceTileSize, Vector2 _position, std::string mapFile, std::string imagePath)
+		: Tilemap(_tileSize, _sourceTileSize, _position, mapFile, imagePath)
+	{
+	}
 };

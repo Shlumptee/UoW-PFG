@@ -35,8 +35,8 @@ int GameLoop::Init()
 
     entities.Push(new Enemy(Vector2(300, 850), player, "./assets/Enemy.png"));
 
-    camera = new Camera(Vector2(canvas.getWidth(), canvas.getHeight()));
-    camera->SetWorldBounds(Vector2(3200.0f, 2400.0f));
+    camera = new Camera({ 0, 0 }, Vector2(canvas.getWidth(), canvas.getHeight()));
+    camera->SetWorldBounds({ 0, 0 }, Vector2(3200.0f, 2400.0f));
 
     fontImage.load("./assets/text2.png");
 

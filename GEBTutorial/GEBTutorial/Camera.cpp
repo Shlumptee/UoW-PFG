@@ -5,13 +5,15 @@ Camera::Camera()
 {
 	position = { 0, 0 };
 	viewportPos = { 0, 0 };
-	worldPos = { 0, 0 };
+	worldPosMax = { 0, 0 };
+	worldPosMin = { 0, 0 };
 }
-Camera::Camera(Vector2 _cameraSize)
+Camera::Camera(Vector2 _cameraSizeMin, Vector2 _cameraSizeMax)
 {
 	position = { 0, 0 };
-	viewportPos = _cameraSize;
-	worldPos = _cameraSize;
+	viewportPos = _cameraSizeMax;
+	worldPosMin = _cameraSizeMin;
+	worldPosMax = _cameraSizeMax;
 }
 
 void Camera::Follow(VisualEntity& target)
@@ -23,12 +25,18 @@ void Camera::Follow(VisualEntity& target)
 	position.x = targetPos.x + (target.GetWidth() * 0.5f) - viewportPos.x * 0.5f;
 	position.y = targetPos.y + (target.GetHeight() * 0.5f) - viewportPos.y * 0.5f;
 
+	if (worldPosMax.x == 0 && worldPosMax.y == 0)
+	{
+		return;
+	}
+
 	ToWorld();
 }
 
-void Camera::SetWorldBounds(Vector2 bounds)
+void Camera::SetWorldBounds(Vector2 boundsMin, Vector2 boundsMax)
 {
-	worldPos = bounds;
+	worldPosMin = boundsMin;
+	worldPosMax = boundsMax;
 
 	ToWorld();
 }
@@ -39,8 +47,8 @@ Vector2 Camera::GetPosition()
 
 void Camera::ToWorld()
 {
-	float maxX = worldPos.x - viewportPos.x;
-	float maxY = worldPos.y - viewportPos.y;
+	float maxX = worldPosMax.x - viewportPos.x;
+	float maxY = worldPosMax.y - viewportPos.y;
 
 	if (maxX < 0)
 	{
@@ -51,11 +59,11 @@ void Camera::ToWorld()
 		maxY = 0;
 	}
 
-	if (position.x < 0)
+	if (position.x < worldPosMin.x)
 	{
 		position.x = 0;
 	}
-	if (position.y < 0)
+	if (position.y < worldPosMin.y)
 	{
 		position.y = 0;
 	}
