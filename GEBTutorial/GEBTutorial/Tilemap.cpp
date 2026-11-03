@@ -103,6 +103,8 @@ void Tilemap::LoadTilemap(std::string& mapFile)
 // Taken from older C++ project that used tilemap collision, also somewhat jank but at least uses AABB collision detection
 bool Tilemap::TileMapCollision(const Rect& bounds, const VisualEntity& entity) const
 {
+	// Calculate the tile indices that the bounds occupy
+	// Small bug with this code, bounds extend out one tile on the left and top edges, need to find a fix
 	int leftTile = ((bounds.min.x - position.x) / tileSize.x);
     int rightTile = ((bounds.max.x - position.x) / tileSize.x);
 

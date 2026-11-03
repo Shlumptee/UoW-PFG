@@ -45,7 +45,33 @@ public:
 	virtual void OnCollision(VisualEntity* other) override
 	{
 		VisualEntity::OnCollision(other);
-		SetPosition(previousPosition);
+		//SetPosition(previousPosition);
+
+		Rect otherBoundingBox = other->GetBoundingBox();
+		Vector2 currentPosition = GetPosition();
+
+		Rect previousBounds = Rect(previousPosition, Vector2(previousPosition.x + GetWidth(), previousPosition.y + GetHeight()));
+
+		bool horizontalOverlap = currentPosition.x < otherBoundingBox.max.x && currentPosition.x + GetWidth() > otherBoundingBox.min.x;
+		bool verticalOverlap = currentPosition.y < otherBoundingBox.max.y && currentPosition.y + GetHeight() > otherBoundingBox.min.y;
+
+		if (!horizontalOverlap || !verticalOverlap)
+		{
+			return;
+		}
+
+		bool horizontalCollision = previousBounds.max.x <= otherBoundingBox.min.x || previousBounds.min.x >= otherBoundingBox.max.x;
+		bool verticalCollision = previousBounds.max.y <= otherBoundingBox.min.y || previousBounds.min.y >= otherBoundingBox.max.y;
+
+		if (horizontalCollision)
+		{
+			SetPosition(Vector2(previousPosition.x, currentPosition.y));
+
+		}
+		if (verticalCollision)
+		{
+			SetPosition(Vector2(currentPosition.x, previousPosition.y));
+		}
 	}
 	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera) override
 	{

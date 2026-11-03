@@ -67,7 +67,50 @@ public:
 			return;
 		}
 
-		SetPosition(previousPosition);
+		Rect otherBoundingBox = other->GetBoundingBox();
+		Vector2 currentPosition = GetPosition();
+
+		Rect previousBounds = Rect(previousPosition, Vector2(previousPosition.x + GetWidth(), previousPosition.y + GetHeight()));
+
+		float leftOverlap = GetBoundingBox().max.x - otherBoundingBox.min.x;
+		float rightOverlap = otherBoundingBox.max.x - GetBoundingBox().min.x;
+		float topOverlap = GetBoundingBox().max.y - otherBoundingBox.min.y;
+		float bottomOverlap = otherBoundingBox.max.y - GetBoundingBox().min.y;
+
+		if (leftOverlap <= 0 || rightOverlap <= 0 || topOverlap <= 0 || bottomOverlap <= 0)
+		{
+			return;
+		}
+
+		float OverlapX = leftOverlap < rightOverlap ? leftOverlap : rightOverlap;
+		float overlapY = topOverlap < bottomOverlap ? topOverlap : bottomOverlap;
+
+		if (OverlapX < overlapY)
+		{
+			if (leftOverlap < rightOverlap)
+			{
+				currentPosition.x -= leftOverlap;
+			}
+			else
+			{
+				currentPosition.x += rightOverlap;
+			}
+		}
+		else
+		{
+			if (topOverlap < bottomOverlap)
+			{
+				currentPosition.y -= topOverlap;
+			}
+			else
+			{
+				currentPosition.y += bottomOverlap;
+			}
+		}
+
+		SetPosition(currentPosition);
+
+		std::cout << "Enemy collided with " << other->GetImagePath() << std::endl;
 
 		Player* player = dynamic_cast<Player*>(other);
 
@@ -78,7 +121,7 @@ public:
 
 		Vector2 direction(player->GetPosition().x - GetPosition().x, player->GetPosition().y - GetPosition().y);
 
-		player->ApplyKnockback(direction, 250.0f);
+		//player->ApplyKnockback(direction, 250.0f);
 		player->GetHealth().RemoveHealth(damage);
 
 		damageTimer = damageCooldown;
