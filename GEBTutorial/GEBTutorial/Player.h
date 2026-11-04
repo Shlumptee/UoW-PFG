@@ -14,8 +14,9 @@ class Player : public VisualEntity
 public:
 	Player(const Vector2 position, std::string filePath) : VisualEntity(position, filePath)
 	{
-		GetHealth().SetMaxHealth(100);
+		std::cout << "Init Player" << std::endl;
 	}
+
 
 	virtual void Update(float deltaTime, Tilemap& tilemap) override
 	{
@@ -125,7 +126,7 @@ public:
 
 				target->ApplyKnockback(direction, 250.0f);
 
-				bool wasAlive = target->GetHealth().IsDead();
+				bool wasAlive = !target->GetHealth().IsDead();
 				int previousHealth = target->GetHealth().GetCurrentHealth();
 
 				target->GetHealth().RemoveHealth(meleeDamage);
@@ -136,15 +137,20 @@ public:
 				{
 					scoreManager.AddScore(damageDealt * 0.75f);
 				}
-				if (!wasAlive && target->GetHealth().IsDead())
+				if (wasAlive && target->GetHealth().IsDead())
 				{
-					std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
 					scoreManager.AddKill(150);
+					std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
 				}
 
 				//std::cout << "Enemy Hit! Health: " << target->GetHealth().GetCurrentHealth() << std::endl;
 			}
 		}
+	}
+
+	virtual void Ability()
+	{
+
 	}
 
 	virtual bool CanBeDamaged() const override
@@ -161,6 +167,16 @@ public:
 		requestingMelee = false;
 		return true;
 	}
+	bool ConsumeAbilityRequest()
+	{
+		if (!requestingAbility)
+		{
+			return false;
+		}
+
+		requestingAbility = false;
+		return true;
+	}
 	void SetInput(const Vector2& _inputAxis)
 	{
 		inputAxis = _inputAxis;
@@ -169,6 +185,18 @@ public:
 	{
 		meleeInput = _meleeInput;
 	}
+	void SetAbilityInput(bool _abilityInput)
+	{
+		abilityInput = _abilityInput;
+	}
+	void SetMoveSpeed(float _moveSpeed)
+	{
+		moveSpeed = _moveSpeed;
+	}
+	void SetMeleeDamage(float _meleeDamage)
+	{
+		meleeDamage = _meleeDamage;
+	}
 	const Vector2& GetInput() const
 	{
 		return inputAxis;
@@ -176,6 +204,14 @@ public:
 	int GetCurrentHealth()
 	{
 		return GetHealth().GetCurrentHealth();
+	}
+	float GetMoveSpeed()
+	{
+		return moveSpeed;
+	}
+	float GetMeleeDamage()
+	{
+		return meleeDamage;
 	}
 	
 private:
@@ -186,6 +222,14 @@ private:
 	bool requestingMelee = false;
 	bool previousMeleeInput = false;
 	bool meleeInput = false;
+	float meleeCooldown = 0.5f;
+	float meleeTimer = 0.0f;
+
+	bool requestingAbility = false;
+	bool previousAbilityInput = false;
+	bool abilityInput = false;
+	float abilityCooldown = 10.0f;
+	float abilityTimer = 0.0f;
 
 	Vector2 inputAxis;
 	Vector2 orientation = { 0, 1 };
@@ -196,10 +240,39 @@ private:
 
 class PlayerWarrior : public Player
 {
+public:
+	PlayerWarrior(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
+	{
+		GetHealth().SetMaxHealth(150);
+		
+	}
 	void Update(float deltaTime, Tilemap& tilemap) override
 	{
 		// Implement specific update logic for PlayerWarrior
 		Player::Update(deltaTime, tilemap);
+	}
+};
+
+class PlayerArcher : public Player
+{
+public:
+	PlayerArcher(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
+	{
+		std::cout << "Init Archer" << std::endl;
+		GetHealth().SetMaxHealth(85);
+		SetMeleeDamage(20.0f);
+		SetMoveSpeed(192.0f);
+	}
+};
+
+class PlayerMage : public Player
+{
+public:
+	PlayerMage(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
+	{
+		GetHealth().SetMaxHealth(100);
+		SetMeleeDamage(20.0f);
+		SetMoveSpeed(160.0f);
 	}
 };
 

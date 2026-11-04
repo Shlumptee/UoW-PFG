@@ -56,7 +56,7 @@ void GameplayScreen::Init()
         Vector2(200, 200),
         "./assets/Levels/3 RLE.txt", "./assets/TileMapAtlas.png");
 
-    player = new Player(Vector2(100, 100), "./assets/Circle.png");
+    player = new PlayerArcher(Vector2(100, 100), "./assets/Circle.png");
     entities.Push(player);
     entities.Push(new Enemy(Vector2(500, 300), player, "./assets/Enemy.png"));
     entities.Push(new Enemy(Vector2(600, 110), player, "./assets/Enemy.png"));

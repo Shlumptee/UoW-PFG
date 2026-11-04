@@ -61,6 +61,7 @@ public:
 	void SetMaxHealth(float _maxHealth)
 	{
 		maxHealth = _maxHealth;
+		currentHealth = _maxHealth;
 	}
 private:
 	float currentHealth;

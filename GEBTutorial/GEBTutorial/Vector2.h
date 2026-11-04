@@ -48,7 +48,8 @@ public:
 	}
 };
 
-template <typename T> class DynamicArray
+template <typename T>
+class DynamicArray
 {
 public:
 	DynamicArray()
@@ -108,8 +109,6 @@ public:
 		{
 			return;
 		}
-
-		array[size - 1] = 0;
 		size--;
 
 		if (capacity > 4 && size <= capacity / 4)
@@ -260,4 +259,226 @@ private:
 	T* array;
 	int size;
 	int capacity;
+};
+
+template <typename T>
+struct Node
+{
+	T data;
+	Node<T>* next;
+
+	Node(const T& _data)
+	{
+		data = _data;
+		next = nullptr;
+	}
+};
+
+template <typename T>
+class Queue
+{
+public:
+	Queue()
+	{
+		head = tail = nullptr;
+	}
+	~Queue()
+	{
+		Clear();
+	}
+
+	void Enqueue(const T& _data)
+	{
+		Node<T>* newNode = new Node(_data);
+
+		if (tail == nullptr)
+		{
+			head = tail = newNode;
+		}
+		else
+		{
+			tail->next = newNode;
+			tail = newNode;
+		}
+	}
+	T Dequeue()
+	{
+		if (head == nullptr)
+		{
+			return T();
+		}
+
+		Node<T>* node = head;
+
+		if (head != tail)
+		{
+			head = head->next;
+		}
+		else
+		{
+			head = tail = nullptr;
+		}
+
+		T _data = node->data;
+
+		delete node;
+		return _data;
+	}
+
+	T& Peek()
+	{
+		return head->data;
+	}
+	bool IsEmpty()
+	{
+		return head == nullptr;
+	}
+
+	void Clear()
+	{
+		while (!IsEmpty())
+		{
+			Dequeue();
+		}
+	}
+private:
+	Node<T>* head;
+	Node<T>* tail;
+};
+
+template <typename T>
+class Stack
+{
+public:
+	Stack()
+	{
+		head = nullptr;
+	}
+	~Stack()
+	{
+		Clear();
+	}
+
+	void Push(T& _data)
+	{
+		Node<T>* newNode = new Node(_data);
+		newNode->next = head;
+		head = newNode;
+	}
+	T Pop()
+	{
+		if (head == nullptr)
+		{
+			return T();
+		}
+
+		Node<T>* newNode = head;
+		head = head->next;
+		T data = newNode->data;
+
+		delete newNode;
+		return data;
+	}
+
+	T& Peek()
+	{
+		return head->data;
+	}
+	bool IsEmpty()
+	{
+		return head == nullptr;
+	}
+	void Clear()
+	{
+		while (!IsEmpty())
+		{
+			Pop();
+		}
+	}
+private:
+	Node<T>* head;
+};
+
+template <typename T>
+class LinkedList
+{
+public:
+	LinkedList()
+	{
+		head = nullptr;
+	}
+	~LinkedList()
+	{
+		Clear();
+	}
+
+	void Add(T& _data)
+	{
+		Node<T>* newNode = new Node(_data);
+		newNode->next = head;
+		head = newNode;
+	}
+	void Remove(T& _data)
+	{
+		Node<T>* currentNode = head;
+		Node<T>* previousNode = nullptr;
+
+		while (currentNode != nullptr)
+		{
+			if (currentNode->data == _data)
+			{
+				if (previousNode == nullptr)
+				{
+					head = currentNode->next;
+				}
+				else
+				{
+					previousNode->next = currentNode->next;
+				}
+
+				delete currentNode;
+				return;
+			}
+
+			previousNode = currentNode;
+			currentNode = currentNode->next;
+		}
+	}
+
+	bool Contains(T& _data)
+	{
+		Node<T>* currentNode = head;
+
+		while (currentNode != nullptr)
+		{
+			if (currentNode->data == _data)
+			{
+				return true;
+			}
+
+			currentNode = currentNode->next;
+		}
+
+		return false;
+	}
+
+	bool IsEmpty()
+	{
+		return head == nullptr;
+	}
+	void Clear()
+	{
+		Node<T>* currentNode = head;
+
+		while (!IsEmpty())
+		{
+			Node<T>* nextNode = currentNode->next;
+			head = head->next;
+			delete currentNode;
+		}
+
+		head = nullptr;
+	}
+private:
+	Node<T>* head;
 };
