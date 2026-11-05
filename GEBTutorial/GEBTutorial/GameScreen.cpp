@@ -61,7 +61,7 @@ void GameplayScreen::Init()
         Vector2(200, 200),
         "./assets/Levels/3 RLE.txt", "./assets/TileMapAtlas.png");
 
-    player = new PlayerArcher(Vector2(100, 100), "./assets/Circle.png");
+    player = new PlayerMage(Vector2(100, 100), "./assets/Circle.png");
     entities.Push(player);
     entities.Push(new Enemy(Vector2(500, 300), player, "./assets/Enemy.png"));
     entities.Push(new Enemy(Vector2(600, 110), player, "./assets/Enemy.png"));
@@ -199,16 +199,15 @@ void GameplayScreenInfinite::Init()
 
     player = new Player(Vector2(100, 100), "./assets/Circle.png");
     entities.Push(player);
-    entities.Push(new Enemy(Vector2(500, 300), player, "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(600, 110), player, "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(100, 600), player, "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(400, 150), player, "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(100, 500), player, "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(500, 200), player, "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(500, 100), player, "./assets/Enemy.png"));
-    entities.Push(new Enemy(Vector2(800, 600), player, "./assets/Enemy.png"));
-
-    entities.Push(new Enemy(Vector2(300, 850), player, "./assets/Enemy.png"));
+    entities.Push(new ZombieEnemy(Vector2(500, 300), player, "./assets/Enemy.png"));
+    entities.Push(new ZombieEnemy(Vector2(600, 110), player, "./assets/Enemy.png"));
+    entities.Push(new SlimeEnemy(Vector2(100, 600), player, "./assets/SlimeEnemy.png"));
+    entities.Push(new SlimeEnemy(Vector2(400, 150), player, "./assets/SlimeEnemy.png"));
+    entities.Push(new ZombieEnemy(Vector2(100, 500), player, "./assets/Enemy.png"));
+    entities.Push(new SkeletonEnemy(Vector2(500, 200), player, "./assets/SkeletonEnemy.png"));
+    entities.Push(new SkeletonEnemy(Vector2(500, 100), player, "./assets/SkeletonEnemy.png"));
+    entities.Push(new ZombieEnemy(Vector2(800, 600), player, "./assets/Enemy.png"));
+    entities.Push(new SkeletonEnemy(Vector2(300, 850), player, "./assets/SkeletonEnemy.png"));
 
     camera = new Camera({ 0, 0 }, Vector2(window.getWidth(), window.getHeight()));
     camera->SetWorldBounds({ -10000, -10000 }, { 10000, 10000 });

@@ -134,6 +134,23 @@ public:
 	{
 		return true;
 	}
+
+	void SetMoveSpeed(float _moveSpeed)
+	{
+		moveSpeed = _moveSpeed;
+	}
+	void SetDamage(float _damage)
+	{
+		damage = _damage;
+	}
+	float GetMoveSpeed()
+	{
+		return moveSpeed;
+	}
+	float GetDamage()
+	{
+		return damage;
+	}
 private:
 	float moveSpeed = 32.0f;
 	float damage = 10.0f;
@@ -144,4 +161,43 @@ private:
 	Rect boundingBox{ Vector2(GetPosition().x , GetPosition().y), Vector2(GetPosition().x + GetWidth(), GetPosition().y + GetHeight()) };
 	Player* player = nullptr;
 	Vector2 previousPosition;
+};
+
+class ZombieEnemy : public Enemy
+{
+public:
+	ZombieEnemy(const Vector2 _position, Player* _player, std::string _filePath) : Enemy(_position, _player, _filePath)
+	{
+		GetHealth().SetMaxHealth(130.0f);
+		SetMoveSpeed(48.0f);
+		SetDamage(15.0f);
+	}
+private:
+	std::string filePath = "./assets/Enemy.png";
+};
+
+class SlimeEnemy : public Enemy
+{
+public:
+	SlimeEnemy(const Vector2 _position, Player* _player, std::string _filePath) : Enemy(_position, _player, _filePath)
+	{
+		GetHealth().SetMaxHealth(100.0f);
+		SetMoveSpeed(128.0f);
+		SetDamage(5.0f);
+	}
+private:
+	std::string filePath = "./assets/SlimeEnemy.png";
+};
+
+class SkeletonEnemy : public Enemy
+{
+public:
+	SkeletonEnemy(const Vector2 _position, Player* _player, std::string _filePath) : Enemy(_position, _player, _filePath)
+	{
+		GetHealth().SetMaxHealth(60.0f);
+		SetMoveSpeed(72.0f);
+		SetDamage(10.0f);
+	}
+private:
+	std::string filePath = "./assets/SkeletonEnemy.png";
 };

@@ -272,7 +272,6 @@ public:
 	// Ricochet ability for archer
 	void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager) override
 	{
-		std::cout << "Start" << std::endl;
 		Queue<VisualEntity*> targets;
 		LinkedList<VisualEntity*> visitedTargets;
 
@@ -312,7 +311,6 @@ public:
 
 				if (distance <= range && distance <= closestDistance)
 				{
-					std::cout << "New distance" << std::endl;
 					closestDistance = distance;
 					closestTarget = candidate;
 				}
@@ -370,6 +368,96 @@ public:
 		GetHealth().SetMaxHealth(100);
 		SetMeleeDamage(20.0f);
 		SetMoveSpeed(160.0f);
+	}
+
+	void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager) override
+	{
+		DynamicArray<VisualEntity*> targets;
+
+		Vector2 searchPosition(GetPosition().x + GetWidth() * 0.5f, GetPosition().y + GetHeight() * 0.5f);
+
+		const float range = 250.0f;
+		const float damage = GetMeleeDamage() * 1.5f;
+		const int maxTargets = 3;
+
+		for (int i = 0; i < entities.GetSize(); i++)
+		{
+			VisualEntity* candidate = entities[i];
+
+			if (candidate == nullptr || candidate == this)
+			{
+				continue;
+			}
+
+			if (!candidate->CanBeDamaged())
+			{
+				continue;
+			}
+
+			Vector2 candidatePosition(candidate->GetPosition().x + candidate->GetWidth() * 0.5f, candidate->GetPosition().y + candidate->GetHeight() * 0.5f);
+			Vector2 positionDifference = candidatePosition - searchPosition;
+			float distance = positionDifference.Length();
+
+			if (distance <= range)
+			{
+				targets.Push(candidate);
+			}
+		}
+
+		// Using selection sorting as it shouldn't be taking too many targets at once, should be quick to sort
+		for (int i = 0; i < targets.GetSize() - 1; i++)
+		{
+			int highestIndex = i;
+
+			for (int j = i + 1; j < targets.GetSize(); j++)
+			{
+				if (targets[j]->GetHealth().GetCurrentHealth() > targets[highestIndex]->GetHealth().GetCurrentHealth())
+				{
+					highestIndex = j;
+				}
+			}
+
+			if (highestIndex != i)
+			{
+				VisualEntity* temp = targets[i];
+				targets[i] = targets[highestIndex];
+				targets[highestIndex] = temp;
+			}
+		}
+
+		int hitTargets = targets.GetSize();
+
+		if (hitTargets > maxTargets)
+		{
+			hitTargets = maxTargets;
+		}
+
+		for (int i = 0; i < hitTargets; i++)
+		{
+			VisualEntity* target = targets[i];
+
+			if (target == nullptr || target->GetHealth().IsDead())
+			{
+				continue;
+			}
+
+			bool wasAlive = !target->GetHealth().IsDead();
+			int previousHealth = target->GetHealth().GetCurrentHealth();
+
+			target->GetHealth().RemoveHealth(damage);
+
+			int damageDealt = previousHealth - target->GetHealth().GetCurrentHealth();
+
+			if (damageDealt > 0)
+			{
+				scoreManager.AddScore(damageDealt * 0.75f);
+			}
+			if (wasAlive && target->GetHealth().IsDead())
+			{
+				scoreManager.AddKill(150);
+				std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+			}
+		}
 	}
 };
 
