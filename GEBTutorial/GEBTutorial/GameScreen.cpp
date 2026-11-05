@@ -4,12 +4,17 @@
 #include "Enemy.h"
 #include "GameManager.h"
 
+void GameScreen::RenderFPSCounter(GamesEngineeringBase::Window& window)
+{
+    std::string fpsString = "FPS:" + std::to_string(fps);
+    Render_String(window, gameManager.fontImage, fpsString.c_str(), Vector2(1024 - 32 * 8, 768 - 32), 32);
+}
+
 #pragma region MainMenuScreen
 
 void MainMenuScreen::Init()
 {
 	// Initialize main menu screen
-    GameScreen::Init();
 }
 
 void MainMenuScreen::HandleInput()
@@ -31,7 +36,7 @@ void MainMenuScreen::Draw(GamesEngineeringBase::Window& window)
 	// Draw main menu screen
     Render_Background(window, 184, 143, 67);
 
-    Render_String(window, GetFontImage(), "Main Menu", {350, 25});
+    Render_String(window, gameManager.fontImage, "Main Menu", {350, 25});
 
     RenderFPSCounter(window);
 }
@@ -97,6 +102,7 @@ void GameplayScreen::HandleInput()
 
     player->SetInput(input);
     player->SetMeleeInput(window.keyPressed('E'));
+    player->SetAbilityInput(window.keyPressed('Q'));
 }
 
 void GameplayScreen::Update(float deltaTime)
@@ -123,6 +129,10 @@ void GameplayScreen::Update(float deltaTime)
     {
         player->MeleeAttack(*quadtree, entities, gameManager.GetScoreManager());
     }
+    if (player->ConsumeAbilityRequest())
+    {
+        player->Ability(entities, gameManager.GetScoreManager());
+    }
 }
 
 void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
@@ -146,7 +156,7 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
 
     //Render_String(window, fontImage, "sjdnsjdjsdhjsdhsjdhjsdhjsdhjshdjhdsjhshdjsd", Vector2(0, 0));
 	RenderFPSCounter(window);
-    Render_Number(window, GetFontImage(), (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
+    Render_Number(window, gameManager.fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
 }
 
 void GameplayScreen::Destroy()
@@ -164,6 +174,11 @@ void GameplayScreen::Destroy()
         quadtree = nullptr;
     }
 
+    delete camera;
+    delete tilemap;
+
+    camera = nullptr;
+    tilemap = nullptr;
     player = nullptr;
 }
 
@@ -262,7 +277,7 @@ void GameplayScreenInfinite::Draw(GamesEngineeringBase::Window& window)
         entities[i]->Draw(window, *camera);
     }
     RenderFPSCounter(window);
-    Render_Number(window, GetFontImage(), (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
+    Render_Number(window, gameManager.fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
 }
 
 void GameplayScreenInfinite::Destroy()
@@ -280,6 +295,11 @@ void GameplayScreenInfinite::Destroy()
         quadtree = nullptr;
     }
 
+    delete camera;
+    delete tilemap;
+
+    camera = nullptr;
+    tilemap = nullptr;
     player = nullptr;
 }
 
@@ -328,10 +348,10 @@ void TallyScreen::Update(float deltaTime)
 void TallyScreen::Draw(GamesEngineeringBase::Window& window)
 {
 	// Draw tally screen
-    Render_String(window, GetFontImage(), scoreString.c_str(), {50, 100});
-    Render_String(window, GetFontImage(), killsString.c_str(), {50, 200});
-    Render_String(window, GetFontImage(), timeAliveString.c_str(), {50, 300});
-	Render_String(window, GetFontImage(), "Tally Screen", {350, 25});
+    Render_String(window, gameManager.fontImage, scoreString.c_str(), {50, 100});
+    Render_String(window, gameManager.fontImage, killsString.c_str(), {50, 200});
+    Render_String(window, gameManager.fontImage, timeAliveString.c_str(), {50, 300});
+	Render_String(window, gameManager.fontImage, "Tally Screen", {350, 25});
 
     RenderFPSCounter(window);
 }
@@ -375,7 +395,7 @@ void GameOverScreen::Draw(GamesEngineeringBase::Window& window)
 	// Draw game over screen
 	Render_Background(window, 128, 0, 0);
 
-	Render_String(window, GetFontImage(), "Game Over!", { 350, 25 });
+	Render_String(window, gameManager.fontImage, "Game Over!", { 350, 25 });
 
     RenderFPSCounter(window);
 }

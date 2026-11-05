@@ -468,13 +468,11 @@ public:
 	}
 	void Clear()
 	{
-		Node<T>* currentNode = head;
-
 		while (!IsEmpty())
 		{
-			Node<T>* nextNode = currentNode->next;
+			Node<T>* nextNode = head;
 			head = head->next;
-			delete currentNode;
+			delete nextNode;
 		}
 
 		head = nullptr;

@@ -5,6 +5,7 @@ int GameManager::Init()
     window.create(1024, 768, "Blast'ems++");
 
     isRunning = true;
+	fontImage.load("./assets/text2.png");
 
     ChangeScreen();
 

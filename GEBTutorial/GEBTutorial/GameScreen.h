@@ -10,13 +10,13 @@ class GameScreen
 public:
 	GameScreen(GamesEngineeringBase::Window& _window, GameManager& _gameManager) : window(_window), gameManager(_gameManager)
 	{
-
 	}
-	virtual ~GameScreen() = default;
+	virtual ~GameScreen()
+	{
+	}
 
 	virtual void Init()
 	{
-		fontImage.load("./assets/text2.png");
 	}
 	virtual void HandleInput() = 0;
 	virtual void Update(float deltaTime) = 0;
@@ -35,24 +35,13 @@ public:
 		}
 	}
 
-	void RenderFPSCounter(GamesEngineeringBase::Window& window)
-	{
-		std::string fpsString = "FPS:" + std::to_string(fps);
-		Render_String(window, fontImage, fpsString.c_str(), Vector2(1024 - 32 * 8, 768 - 32), 32);
-	}
-
-	GamesEngineeringBase::Image& GetFontImage()
-	{
-		return fontImage;
-	}
+	void RenderFPSCounter(GamesEngineeringBase::Window& window);
 
 protected:
 	GamesEngineeringBase::Window& window;
 	GameManager& gameManager;
 
 private:
-	GamesEngineeringBase::Image fontImage;
-
 	float fpsTimer;
 	int fpsCount;
 	int fps;

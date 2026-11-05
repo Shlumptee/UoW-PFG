@@ -40,8 +40,13 @@ public:
 		{
 			requestingMelee = true;
 		}
+		if (abilityInput && !previousAbilityInput)
+		{
+			requestingAbility = true;
+		}
 
 		previousMeleeInput = meleeInput;
+		previousAbilityInput = abilityInput;
 	}
 	virtual void OnCollision(VisualEntity* other) override
 	{
@@ -148,9 +153,9 @@ public:
 		}
 	}
 
-	virtual void Ability()
+	virtual void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager)
 	{
-
+		std::cout << "Only calling here" << std::endl;
 	}
 
 	virtual bool CanBeDamaged() const override
@@ -262,6 +267,98 @@ public:
 		GetHealth().SetMaxHealth(85);
 		SetMeleeDamage(20.0f);
 		SetMoveSpeed(192.0f);
+	}
+
+	// Ricochet ability for archer
+	void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager) override
+	{
+		std::cout << "Start" << std::endl;
+		Queue<VisualEntity*> targets;
+		LinkedList<VisualEntity*> visitedTargets;
+
+		Vector2 searchPosition(GetPosition().x + GetWidth() * 0.5f, GetPosition().y + GetHeight() * 0.5f);
+
+		const float range = 200.0f;
+		const float damage = GetMeleeDamage() * 0.75f;
+		const int maxTargets = 5;
+
+		for (int i = 0; i < maxTargets; i++)
+		{
+			VisualEntity* closestTarget = nullptr;
+			float closestDistance = 999.0f;
+
+			for (int j = 0; j < entities.GetSize(); j++)
+			{
+				VisualEntity* candidate = entities[j];
+
+				if (candidate == nullptr || candidate == this)
+				{
+					continue;
+				}
+
+				if (!candidate->CanBeDamaged())
+				{
+					continue;
+				}
+
+				if (visitedTargets.Contains(candidate))
+				{
+					continue;
+				}
+
+				Vector2 candidatePosition(candidate->GetPosition().x + candidate->GetWidth() * 0.5f, candidate->GetPosition().y + candidate->GetHeight() * 0.5f);
+				Vector2 positionDifference = candidatePosition - searchPosition;
+				float distance = positionDifference.Length();
+
+				if (distance <= range && distance <= closestDistance)
+				{
+					std::cout << "New distance" << std::endl;
+					closestDistance = distance;
+					closestTarget = candidate;
+				}
+			}
+
+			if (closestTarget == nullptr)
+			{
+				break;
+			}
+
+			targets.Enqueue(closestTarget);
+			visitedTargets.Add(closestTarget);
+
+			searchPosition.Set(closestTarget->GetPosition().x + closestTarget->GetWidth() * 0.5f, closestTarget->GetPosition().y + closestTarget->GetHeight() * 0.5f);
+		}
+
+		while (!targets.IsEmpty())
+		{
+			VisualEntity* target = targets.Dequeue();
+
+			if (target == nullptr || target->GetHealth().IsDead())
+			{
+				continue;
+			}
+
+			Vector2 direction(target->GetPosition().x - GetPosition().x, target->GetPosition().y - GetPosition().y);
+
+			target->ApplyKnockback(direction, 250.0f);
+
+			bool wasAlive = !target->GetHealth().IsDead();
+			int previousHealth = target->GetHealth().GetCurrentHealth();
+
+			target->GetHealth().RemoveHealth(damage);
+
+			int damageDealt = previousHealth - target->GetHealth().GetCurrentHealth();
+
+			if (damageDealt > 0)
+			{
+				scoreManager.AddScore(damageDealt * 0.75f);
+			}
+			if (wasAlive && target->GetHealth().IsDead())
+			{
+				scoreManager.AddKill(150);
+				std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+			}
+		}
 	}
 };
 

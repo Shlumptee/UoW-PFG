@@ -17,9 +17,11 @@ enum class GameState
 class GameManager
 {
 public:
+	GamesEngineeringBase::Image fontImage;
+
 	GameManager()
 	{
-		currentState = GameState::Game;
+		currentState = GameState::MainMenu;
 	}
 
 	int Init();
