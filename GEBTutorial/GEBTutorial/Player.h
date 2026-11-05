@@ -269,7 +269,8 @@ public:
 		SetMoveSpeed(192.0f);
 	}
 
-	// Ricochet ability for archer
+	// Ricochet ability for archer - bounces an attack between up to a max amount of enemies
+	// Uses queues to add entities within range, and a linked list to ensure that an enemy that has been previously visited cannot be visited again
 	void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager) override
 	{
 		Queue<VisualEntity*> targets;
@@ -281,11 +282,13 @@ public:
 		const float damage = GetMeleeDamage() * 0.75f;
 		const int maxTargets = 5;
 
+		// Loop until attained all targets nearby
 		for (int i = 0; i < maxTargets; i++)
 		{
 			VisualEntity* closestTarget = nullptr;
 			float closestDistance = 999.0f;
 
+			// Loop through all entities in the array (not optimal), and find the closest enemy
 			for (int j = 0; j < entities.GetSize(); j++)
 			{
 				VisualEntity* candidate = entities[j];
@@ -321,12 +324,15 @@ public:
 				break;
 			}
 
+			// Add closest target to both the queue and list
 			targets.Enqueue(closestTarget);
 			visitedTargets.Add(closestTarget);
 
+			// Reset search pos to the closest target so it can search for more nearby itself
 			searchPosition.Set(closestTarget->GetPosition().x + closestTarget->GetWidth() * 0.5f, closestTarget->GetPosition().y + closestTarget->GetHeight() * 0.5f);
 		}
 
+		// Loop until the queue is empty, do usual damage calculations
 		while (!targets.IsEmpty())
 		{
 			VisualEntity* target = targets.Dequeue();
@@ -370,6 +376,7 @@ public:
 		SetMoveSpeed(160.0f);
 	}
 
+	// Magic Ability - Get all the nearby enemies and pick out 3 with the highest health -> deal damage (no knockback)
 	void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager) override
 	{
 		DynamicArray<VisualEntity*> targets;
@@ -380,6 +387,7 @@ public:
 		const float damage = GetMeleeDamage() * 1.5f;
 		const int maxTargets = 3;
 
+		// Loop through all entities in the array (probably not too efficient) to find the ones within range of the player
 		for (int i = 0; i < entities.GetSize(); i++)
 		{
 			VisualEntity* candidate = entities[i];
@@ -394,6 +402,7 @@ public:
 				continue;
 			}
 
+			// Get difference between current candidate and the player
 			Vector2 candidatePosition(candidate->GetPosition().x + candidate->GetWidth() * 0.5f, candidate->GetPosition().y + candidate->GetHeight() * 0.5f);
 			Vector2 positionDifference = candidatePosition - searchPosition;
 			float distance = positionDifference.Length();
@@ -405,6 +414,8 @@ public:
 		}
 
 		// Using selection sorting as it shouldn't be taking too many targets at once, should be quick to sort
+		// Taken from https://www.geeksforgeeks.org/dsa/selection-sort-algorithm-2/
+		// Sort by highest health
 		for (int i = 0; i < targets.GetSize() - 1; i++)
 		{
 			int highestIndex = i;
@@ -425,6 +436,7 @@ public:
 			}
 		}
 
+		// Clamp the amount of targets being hit to the value of maxTargets
 		int hitTargets = targets.GetSize();
 
 		if (hitTargets > maxTargets)
@@ -432,6 +444,8 @@ public:
 			hitTargets = maxTargets;
 		}
 
+		// Loop through and do usual damage routine
+		// Should move all this stuff to a universal function in Player, it's used a lot
 		for (int i = 0; i < hitTargets; i++)
 		{
 			VisualEntity* target = targets[i];
