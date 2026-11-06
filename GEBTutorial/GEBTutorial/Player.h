@@ -415,7 +415,7 @@ public:
 
 	void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager) override
 	{
-		projectileManager.FireProjectile(GetPosition(), GetOrientation(), ProjectileOwner::Player, "./assets/Projectile.png");
+		projectileManager.FireProjectile(GetPosition(), GetOrientation(), GetattackDamage(), ProjectileOwner::Player, "./assets/Projectile.png");
 	}
 
 	// Ricochet ability for archer - bounces an attack between up to a max amount of enemies
@@ -548,7 +548,7 @@ public:
 		if (mana >= 20)
 		{
 			mana -= 20;
-			projectileManager.FireProjectile(GetPosition(), GetOrientation(), ProjectileOwner::Player, "./assets/Projectile.png");
+			projectileManager.FireProjectile(GetPosition(), GetOrientation(), GetattackDamage(), ProjectileOwner::Player, "./assets/Projectile.png");
 		}
 	}
 

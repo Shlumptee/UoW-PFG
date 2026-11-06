@@ -45,6 +45,7 @@ private:
 	GamesEngineeringBase::Image image;
 };
 
+// No infinite tilemap, tried to spend a day working on it but implementation was too much and ran out of time
 class InfiniteTilemap : public Tilemap
 {
 	InfiniteTilemap()

@@ -196,7 +196,7 @@ public:
 	SlimeEnemy(const Vector2 _position, Player* _player, std::string _filePath) : Enemy(_position, _player, _filePath)
 	{
 		GetHealth().SetMaxHealth(100.0f);
-		SetMoveSpeed(128.0f);
+		SetMoveSpeed(96.0f);
 		SetDamage(5.0f);
 	}
 private:
@@ -210,7 +210,7 @@ public:
 	{
 		projectileManager = _projectileManager;
 		GetHealth().SetMaxHealth(60.0f);
-		SetMoveSpeed(72.0f);
+		SetMoveSpeed(64.0f);
 		SetDamage(10.0f);
 	}
 
@@ -229,7 +229,7 @@ public:
 
 		if (distance <= projectileRange && distance >= 40.0f)
 		{
-			projectileManager->FireProjectile(GetPosition(), direction, ProjectileOwner::Enemy, "./assets/Projectile.png");
+			projectileManager->FireProjectile(GetPosition(), direction, GetDamage(), ProjectileOwner::Enemy, "./assets/Projectile.png");
 
 			projectileTimer = projectileCooldown;
 		}

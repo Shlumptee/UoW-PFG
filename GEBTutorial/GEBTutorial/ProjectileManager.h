@@ -19,7 +19,7 @@ public:
 
 	// Shoot out the projectile with a starting position and a direction
 	// Need the owner to make sure they don't get damaged
-	void FireProjectile(Vector2 _position, Vector2 _direction, ProjectileOwner _owner, const std::string& _imagePath)
+	void FireProjectile(Vector2 _position, Vector2 _direction, float _damage, ProjectileOwner _owner, const std::string& _imagePath)
 	{
 		Projectile* projectile = nullptr;
 
@@ -35,10 +35,11 @@ public:
 		}
 
 		// Activate individual projectile
-		projectile->Activate(_position, _direction, 256.0f, 2.5f, _owner);
+		projectile->Activate(_position, _direction, 256.0f, _damage, 2.5f, _owner);
 		activeProjectiles.Push(projectile);
 	}
 
+	// Update all active projectiles
 	void Update(float deltaTime, Tilemap& tilemap)
 	{
 		for (int i = 0; i < activeProjectiles.GetSize(); i++)
@@ -48,6 +49,7 @@ public:
 
 		CheckProjectileRecycle();
 	}
+	// Draw all active projectiles to the screen
 	void Draw(GamesEngineeringBase::Window& window, Camera& camera)
 	{
 		for (int i = 0; i < activeProjectiles.GetSize(); i++)
@@ -59,6 +61,7 @@ public:
 	// SHOULD FIGURE OUT A WAY TO FIT INTO COLLISION MANAGER AND QUADTREE, BAD IMPLEMENTATION HERE!!!
 	void CheckCollisions(DynamicArray<VisualEntity*>& entities, Quadtree& quadtree)
 	{
+		// Get all the active projectiles (inactive not needed as they shouldn't show in game)
 		for (int i = 0; i < activeProjectiles.GetSize(); i++)
 		{
 			Projectile* projectile = activeProjectiles[i];
@@ -68,6 +71,7 @@ public:
 				continue;
 			}
 
+			// Loop through every entity stored in the dynamic array and check whether the projectile is not on the same team
 			for (int j = 0; j < entities.GetSize(); j++)
 			{
 				VisualEntity* target = entities[j];
@@ -87,9 +91,10 @@ public:
 					continue;
 				}
 
+				// Check if projectile intersects with the target entity, if it does deal damage and deactivate projectile
 				if (quadtree.Intersects(projectile->GetBoundingBox(), target->GetBoundingBox()))
 				{
-					target->GetHealth().RemoveHealth(20.0f);
+					target->GetHealth().RemoveHealth(projectile->GetDamage());
 					projectile->Deactivate();
 					break;
 				}
@@ -99,12 +104,15 @@ public:
 		CheckProjectileRecycle();
 	}
 
+	// Clear projectiles from stack and dynamicarray
 	void Clear()
 	{
 		for (int i = 0; i < activeProjectiles.GetSize(); i++)
 		{
 			delete activeProjectiles[i];
 		}
+
+		activeProjectiles.Clear();
 
 		while (!inactiveProjectiles.IsEmpty())
 		{

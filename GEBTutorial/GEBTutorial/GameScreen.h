@@ -81,7 +81,8 @@ private:
 	Tilemap* tilemap = nullptr;
 	Camera* camera = nullptr;
 
-	float deltaTime = 0.0f;
+	float levelTimer = 0.0f;
+	float maxTime = 60.0f;
 
 	GamesEngineeringBase::Timer timer;
 	Vector2 input{ 0, 0 };
@@ -108,6 +109,9 @@ private:
 	ProjectileManager projectileManager;
 	Tilemap* tilemap = nullptr;
 	Camera* camera = nullptr;
+
+	float levelTimer = 0.0f;
+	float maxTime = 60.0f;
 
 	Vector2 input{ 0, 0 };
 };
@@ -148,4 +152,13 @@ public:
 	void Update(float deltaTime) override;
 	void Draw(GamesEngineeringBase::Window& window) override;
 	void Destroy() override;
+
+private:
+	int score = 0;
+	int kills = 0;
+	float timeAlive = 0.0f;
+
+	std::string scoreString;
+	std::string killsString;
+	std::string timeAliveString;
 };

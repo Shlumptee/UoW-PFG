@@ -14,6 +14,14 @@ enum class GameState
 	GameOver
 };
 
+enum class PlayerClass
+{
+	None,
+	Warrior,
+	Archer,
+	Mage
+};
+
 class GameManager
 {
 public:
@@ -39,6 +47,10 @@ public:
 		currentState = state;
 		ChangeScreen();
 	}
+	void SetPlayerClass(PlayerClass _playerClass)
+	{
+		playerClass = _playerClass;
+	}
 	GameState GetState() const
 	{
 		return currentState;
@@ -50,6 +62,10 @@ public:
 	ScoreManager& GetScoreManager()
 	{
 		return scoreManager;
+	}
+	PlayerClass GetPlayerClass()
+	{
+		return playerClass;
 	}
 
 private:
@@ -64,6 +80,8 @@ private:
 	MainMenuScreen mainMenuScreen{ window, *this };
 	TallyScreen tallyScreen{ window, *this };
 	GameOverScreen gameOverScreen{ window, *this };
+
+	PlayerClass playerClass = PlayerClass::None;
 
 	ScoreManager scoreManager;
 

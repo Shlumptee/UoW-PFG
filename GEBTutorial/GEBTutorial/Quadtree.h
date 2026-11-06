@@ -3,6 +3,7 @@
 #include "Shape.h"
 #include "Entity.h"
 
+// Struct to store an entity that is collidable
 struct CollisionObject
 {
 	VisualEntity* entity = nullptr;
@@ -14,8 +15,17 @@ struct CollisionObject
 		entity = _entity;
 		boundingBox = _boundingBox;
 	}
+
+	// Symbol operator to compare collision objects to each other, used in dynamic arrays when searching for a value
+	bool operator==(CollisionObject other)
+	{
+		return entity == other.entity;
+	}
 };
 
+// Class for managing quadtrees, which are a type of collision detection set up of splitting the screen into 4 quads and running collision between objects that belong to the same quad
+// Each quad can be further broken down into subquads, etc etc until maximum level depth is reached
+// Inspired by learning about quadtrees from this website: https://code.tutsplus.com/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374t, had to convert from Java to C++ but implementation is similar
 class Quadtree
 {
 public:
@@ -102,12 +112,15 @@ public:
 
 	// Insert an object into the quadtree
 	// If the node exceeds the capacity, it will split the node into subnodes and add all objects to their corresponding subnodes
+	// It will then move objects into the appropriate subnode
 	void Insert(const CollisionObject& object)
 	{
 		if (nodes[0] != nullptr)
 		{
+			// Get the what level the bounding box belongs to
 			int index = GetIndex(object.boundingBox);
 
+			// If an object fully fits into a node, insert it there
 			if (index != -1)
 			{
 				nodes[index]->Insert(object);
@@ -115,18 +128,24 @@ public:
 			}
 		}
 
+		// Objects that overlap multiple quadrants (eg: across the midpoint line between 2 quads) will remain in the current node instead of going to a subnode
+		// Push to dynamic array so other components can access what is stored in the quadtree
 		objects.Push(object);
 
+		// Check if the current subnode has exceeded it's maximum number of objects and whether there is too many subnode levels present
 		if (objects.GetSize() > maxObjects && level < maxLevels)
 		{
+			// Split current node into further subnodes
 			if (nodes[0] == nullptr)
 			{
 				Split();
 			}
 
+			// Check objects stored in node and move them
 			int i = 0;
 			while (i < objects.GetSize())
 			{
+				// Find which quadrant the object belongs to, and run same check as earlier
 				int index = GetIndex(objects[i].boundingBox);
 				if (index != -1)
 				{
@@ -144,25 +163,30 @@ public:
 	// Return all objects that could collide with a given object
 	void Retrieve(DynamicArray<CollisionObject>& returnObjects, const Rect& query)
 	{
+		// Add all objects stored in the node into the return objects
 		for (int i = 0; i < objects.GetSize(); i++)
 		{
 			returnObjects.Push(objects[i]);
 		}
 
+		// If the node hasn't been split, return as all objects will collide with each other and there are no subnodes to check
 		if (nodes[0] == nullptr)
 		{
 			return;
 		}
 
+		// Check all 4 subnodes
 		for (int i = 0; i < 4; i++)
 		{
 			const Rect& childBounds = nodes[i]->bounds;
 
+			// Check whether the query object overlaps with the subnode
 			bool isOverlapping = query.min.x < childBounds.max.x &&
 				query.max.x > childBounds.min.x &&
 				query.min.y < childBounds.max.y &&
 				query.max.y > childBounds.min.y;
 
+			// Only search for subnodes that overlap the query object
 			if (isOverlapping)
 			{
 				nodes[i]->Retrieve(returnObjects, query);
@@ -170,6 +194,7 @@ public:
 		}
 	}
 
+	// Check whether two rect colliders intersect
 	bool Intersects(const Rect& a, const Rect& b)
 	{
 		return (a.min.x < b.max.x &&
@@ -181,6 +206,7 @@ public:
 	// Clear the quadtree
 	void Clear()
 	{
+		// Loop through all quadrants of the tree and delete
 		objects.Clear();
 		for (int i = 0; i < 4; i++)
 		{

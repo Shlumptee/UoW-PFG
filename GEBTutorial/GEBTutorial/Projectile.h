@@ -2,10 +2,12 @@
 
 #include "Entity.h"
 
+// Enum for projectiles, assigns them to an owner group
 enum class ProjectileOwner
 {
 	Player,
-	Enemy
+	Enemy,
+	Neutral
 };
 
 class Projectile : public VisualEntity
@@ -16,10 +18,13 @@ public:
 		isActive = false;
 	}
 
-	void Activate(Vector2 _position, Vector2 _direction, float _speed, float _lifeTime, ProjectileOwner _owner)
+	// Activate the projectile from being inactive
+	void Activate(Vector2 _position, Vector2 _direction, float _speed, float _damage, float _lifeTime, ProjectileOwner _owner)
 	{
+		// Projectile needs position of firing entity + direction, and a constant velocity to move at
 		SetPosition(_position);
 		lifeTime = _lifeTime;
+		damage = _damage;
 		owner = _owner;
 		isActive = true;
 
@@ -28,6 +33,7 @@ public:
 
 
 	}
+	// Disable to stop projectile from running update functions
 	void Deactivate()
 	{
 		isActive = false;
@@ -35,13 +41,16 @@ public:
 
 	void Update(float deltaTime, Tilemap& tilemap) override
 	{
+		// Don't run any inactive projectiles
 		if (!isActive)
 		{
 			return;
 		}
 
+		// Run standard update
 		VisualEntity::Update(deltaTime, tilemap);
 
+		// Decrease the lifetime of the projectile
 		lifeTime -= deltaTime;
 		if (lifeTime <= 0)
 		{
@@ -49,8 +58,9 @@ public:
 			return;
 		}
 
+		// Move bullet and check collision with the tilemap
 		Vector2 previousPosition = GetPosition();
-		TileMove(velocity, deltaTime, tilemap);
+		Move(velocity * deltaTime);
 
 		if (!tilemap.TileMapCollision(GetBoundingBox(), *this))
 		{
@@ -58,6 +68,7 @@ public:
 		}
 	}
 
+	// Override tile interaction from VisualEntity as bullets should pass over pits
 	bool TileInteraction(TileType tile) const override
 	{
 		switch (tile)
@@ -78,10 +89,14 @@ public:
 	{
 		return isActive;
 	}
-
+	
 	ProjectileOwner GetOwner()
 	{
 		return owner;
+	}
+	float GetDamage()
+	{
+		return damage;
 	}
 
 private:
@@ -89,6 +104,7 @@ private:
 	Vector2 velocity = { 0, 0 };
 
 	float lifeTime = 0.0f;
+	float damage = 20.0f;
 
 	bool isActive = false;
 };
