@@ -33,7 +33,7 @@ public:
 			return;
 		}
 
-		currentHealth -= amount;
+		currentHealth -= amount * (1.0f - damageReduction);
 
 		if (currentHealth < 0)
 		{
@@ -63,7 +63,12 @@ public:
 		maxHealth = _maxHealth;
 		currentHealth = _maxHealth;
 	}
+	void SetDamageReduction(float _damageReduction)
+	{
+		damageReduction = _damageReduction;
+	}
 private:
 	float currentHealth;
 	float maxHealth;
+	float damageReduction = 0.0f;
 };

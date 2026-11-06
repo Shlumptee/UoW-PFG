@@ -101,8 +101,9 @@ void GameplayScreen::HandleInput()
     }
 
     player->SetInput(input);
-    player->SetMeleeInput(window.keyPressed('E'));
+    player->SetattackInput(window.keyPressed('E'));
     player->SetAbilityInput(window.keyPressed('Q'));
+    player->SetUtilityInput(window.keyPressed(VK_SHIFT));
 }
 
 void GameplayScreen::Update(float deltaTime)
@@ -125,13 +126,20 @@ void GameplayScreen::Update(float deltaTime)
     camera->Follow(*player);
     quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
 
+    projectileManager.Update(deltaTime, *tilemap);
+    projectileManager.CheckCollisions(entities, *quadtree);
+
     if (player->ConsumeMeleeRequest())
     {
-        player->MeleeAttack(*quadtree, entities, gameManager.GetScoreManager());
+        player->MeleeAttack(*quadtree, entities, gameManager.GetScoreManager(), projectileManager);
     }
     if (player->ConsumeAbilityRequest())
     {
         player->Ability(entities, gameManager.GetScoreManager());
+    }
+    if (player->ConsumeUtilityRequest())
+    {
+        player->Utility();
     }
 }
 
@@ -148,6 +156,8 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
     Render_Background(window);
 
     tilemap->Draw(window, *camera);
+
+    projectileManager.Draw(window, *camera);
 
     for (int i = 0; i < entities.GetSize(); i++)
     {
@@ -197,17 +207,17 @@ void GameplayScreenInfinite::Init()
         Vector2(200, 200),
         "./assets/Levels/3 RLE.txt", "./assets/TileMapAtlas.png");
 
-    player = new Player(Vector2(100, 100), "./assets/Circle.png");
+    player = new PlayerWarrior(Vector2(100, 100), "./assets/Circle.png");
     entities.Push(player);
     entities.Push(new ZombieEnemy(Vector2(500, 300), player, "./assets/Enemy.png"));
     entities.Push(new ZombieEnemy(Vector2(600, 110), player, "./assets/Enemy.png"));
     entities.Push(new SlimeEnemy(Vector2(100, 600), player, "./assets/SlimeEnemy.png"));
     entities.Push(new SlimeEnemy(Vector2(400, 150), player, "./assets/SlimeEnemy.png"));
     entities.Push(new ZombieEnemy(Vector2(100, 500), player, "./assets/Enemy.png"));
-    entities.Push(new SkeletonEnemy(Vector2(500, 200), player, "./assets/SkeletonEnemy.png"));
-    entities.Push(new SkeletonEnemy(Vector2(500, 100), player, "./assets/SkeletonEnemy.png"));
+    entities.Push(new SkeletonEnemy(Vector2(500, 200), player, "./assets/SkeletonEnemy.png", &projectileManager));
+    entities.Push(new SkeletonEnemy(Vector2(500, 100), player, "./assets/SkeletonEnemy.png", &projectileManager));
     entities.Push(new ZombieEnemy(Vector2(800, 600), player, "./assets/Enemy.png"));
-    entities.Push(new SkeletonEnemy(Vector2(300, 850), player, "./assets/SkeletonEnemy.png"));
+    entities.Push(new SkeletonEnemy(Vector2(300, 850), player, "./assets/SkeletonEnemy.png", &projectileManager));
 
     camera = new Camera({ 0, 0 }, Vector2(window.getWidth(), window.getHeight()));
     camera->SetWorldBounds({ -10000, -10000 }, { 10000, 10000 });
@@ -235,7 +245,9 @@ void GameplayScreenInfinite::HandleInput()
     }
 
     player->SetInput(input);
-    player->SetMeleeInput(window.keyPressed('E'));
+    player->SetattackInput(window.keyPressed('E'));
+    player->SetAbilityInput(window.keyPressed('Q'));
+    player->SetUtilityInput(window.keyPressed(VK_SHIFT));
 }
 
 void GameplayScreenInfinite::Update(float deltaTime)
@@ -258,9 +270,20 @@ void GameplayScreenInfinite::Update(float deltaTime)
     camera->Follow(*player);
     quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
 
+    projectileManager.Update(deltaTime, *tilemap);
+    projectileManager.CheckCollisions(entities, *quadtree);
+
     if (player->ConsumeMeleeRequest())
     {
-        player->MeleeAttack(*quadtree, entities, gameManager.GetScoreManager());
+        player->MeleeAttack(*quadtree, entities, gameManager.GetScoreManager(), projectileManager);
+    }
+    if (player->ConsumeAbilityRequest())
+    {
+        player->Ability(entities, gameManager.GetScoreManager());
+    }
+    if (player->ConsumeUtilityRequest())
+    {
+        player->Utility();
     }
 }
 
@@ -270,6 +293,8 @@ void GameplayScreenInfinite::Draw(GamesEngineeringBase::Window& window)
     Render_Background(window);
 
     tilemap->Draw(window, *camera);
+
+    projectileManager.Draw(window, *camera);
 
     for (int i = 0; i < entities.GetSize(); i++)
     {

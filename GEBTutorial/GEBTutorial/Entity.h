@@ -8,6 +8,13 @@
 #include "Health.h"
 #include "Tilemap.h"
 
+enum class Team
+{
+	Player,
+	Enemy,
+	Neutral
+};
+
 class Entity
 {
 public:
@@ -174,6 +181,10 @@ public:
 	Vector2 GetKnockbackVelocity() const
 	{
 		return knockbackVelocity;
+	}
+	virtual Team GetTeam()
+	{
+		return Team::Neutral;
 	}
 	void SetImagePath(const std::string& _imagePath)
 	{

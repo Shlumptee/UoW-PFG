@@ -7,6 +7,7 @@
 #include "Shape.h"
 #include "Vector2.h"
 #include "Player.h"
+#include "ProjectileManager.h"
 
 class Enemy : public VisualEntity
 {
@@ -16,6 +17,11 @@ public:
 		GetHealth().SetMaxHealth(100.0f);
 	}
 	Enemy(const Vector2 position, Player* _player, std::string filePath) : VisualEntity(position, filePath)
+	{
+		GetHealth().SetMaxHealth(100.0f);
+		player = _player;
+	}
+	Enemy(const Vector2 position, Player* _player, std::string filePath, ProjectileManager* _projectileManager) : VisualEntity(position, filePath)
 	{
 		GetHealth().SetMaxHealth(100.0f);
 		player = _player;
@@ -151,6 +157,14 @@ public:
 	{
 		return damage;
 	}
+	Team GetTeam() override
+	{
+		return Team::Enemy;
+	}
+	Player* GetPlayer()
+	{
+		return player;
+	}
 private:
 	float moveSpeed = 32.0f;
 	float damage = 10.0f;
@@ -192,12 +206,39 @@ private:
 class SkeletonEnemy : public Enemy
 {
 public:
-	SkeletonEnemy(const Vector2 _position, Player* _player, std::string _filePath) : Enemy(_position, _player, _filePath)
+	SkeletonEnemy(const Vector2 _position, Player* _player, std::string _filePath, ProjectileManager* _projectileManager) : Enemy(_position, _player, _filePath, _projectileManager)
 	{
+		projectileManager = _projectileManager;
 		GetHealth().SetMaxHealth(60.0f);
 		SetMoveSpeed(72.0f);
 		SetDamage(10.0f);
 	}
+
+	virtual void Update(float deltaTime, Tilemap& tilemap) override
+	{
+		Enemy::Update(deltaTime, tilemap);
+
+		if (projectileTimer > 0.0f)
+		{
+			projectileTimer -= deltaTime;
+			return;
+		}
+
+		Vector2 direction(GetPlayer()->GetPosition().x - GetPosition().x, GetPlayer()->GetPosition().y - GetPosition().y);
+		float distance = direction.Length();
+
+		if (distance <= projectileRange && distance >= 40.0f)
+		{
+			projectileManager->FireProjectile(GetPosition(), direction, ProjectileOwner::Enemy, "./assets/Projectile.png");
+
+			projectileTimer = projectileCooldown;
+		}
+	}
 private:
+	ProjectileManager* projectileManager = nullptr;
 	std::string filePath = "./assets/SkeletonEnemy.png";
+
+	float projectileRange = 300.0f;
+	float projectileCooldown = 3.0f;
+	float projectileTimer = 0.0f;
 };

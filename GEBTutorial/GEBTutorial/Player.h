@@ -8,6 +8,7 @@
 #include "Vector2.h"
 #include "Quadtree.h"
 #include "ScoreManager.h"
+#include "ProjectileManager.h"
 
 class Player : public VisualEntity
 {
@@ -22,11 +23,32 @@ public:
 	{
 		VisualEntity::Update(deltaTime, tilemap);
 
+		requestingAbility = false;
+		requestingAttack = false;
+		requestingUtility = false;
+
 		if (inputAxis.x != 0 || inputAxis.y != 0)
 		{
 			orientation = inputAxis;
 		}
 
+		abilityTimer -= deltaTime;
+		if (abilityTimer < 0)
+		{
+			abilityTimer = 0;
+		}
+
+		attackTimer -= deltaTime;
+		if (attackTimer < 0)
+		{
+			attackTimer = 0;
+		}
+
+		utilityTimer -= deltaTime;
+		if (utilityTimer < 0)
+		{
+			utilityTimer = 0;
+		}
 
 		previousPosition = GetPosition();
 		Vector2 movement = (inputAxis * moveSpeed) + GetKnockbackVelocity();
@@ -36,17 +58,22 @@ public:
 
 		boundingBox.Set(GetBoundingBox());
 
-		if (meleeInput && !previousMeleeInput)
+		if (attackInput && !previousAttackInput)
 		{
-			requestingMelee = true;
+			requestingAttack = true;
 		}
 		if (abilityInput && !previousAbilityInput)
 		{
 			requestingAbility = true;
 		}
+		if (utilityInput && !previousUtilityInput)
+		{
+			requestingUtility = true;
+		}
 
-		previousMeleeInput = meleeInput;
+		previousAttackInput = attackInput;
 		previousAbilityInput = abilityInput;
+		previousUtilityInput = utilityInput;
 	}
 	virtual void OnCollision(VisualEntity* other) override
 	{
@@ -85,7 +112,7 @@ public:
 		Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
-	virtual void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager)
+	virtual void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager)
 	{
 		Rect attackBounds;
 		Rect playerBounds = GetBoundingBox();
@@ -93,22 +120,22 @@ public:
 		if (orientation.x > 0)
 		{
 			// Attacking to the right
-			attackBounds.Set({ playerBounds.max.x, playerBounds.min.y }, { playerBounds.max.x + meleeRange, playerBounds.max.y });
+			attackBounds.Set({ playerBounds.max.x, playerBounds.min.y }, { playerBounds.max.x + attackRange, playerBounds.max.y });
 		}
 		else if (orientation.x < 0)
 		{
 			// Attacking to the left
-			attackBounds.Set({ playerBounds.min.x - meleeRange, playerBounds.min.y }, { playerBounds.min.x, playerBounds.max.y });
+			attackBounds.Set({ playerBounds.min.x - attackRange, playerBounds.min.y }, { playerBounds.min.x, playerBounds.max.y });
 		}
 		else if (orientation.y > 0)
 		{
 			// Attacking downwards
-			attackBounds.Set({ playerBounds.min.x, playerBounds.max.y }, { playerBounds.max.x, playerBounds.max.y + meleeRange});
+			attackBounds.Set({ playerBounds.min.x, playerBounds.max.y }, { playerBounds.max.x, playerBounds.max.y + attackRange});
 		}
 		else
 		{
 			// Attacking upwards
-			attackBounds.Set({ playerBounds.min.x, playerBounds.min.y - meleeRange }, { playerBounds.max.x, playerBounds.min.y });
+			attackBounds.Set({ playerBounds.min.x, playerBounds.min.y - attackRange }, { playerBounds.max.x, playerBounds.min.y });
 		}
 
 		for (int i = 0; i < entities.GetSize(); i++)
@@ -134,7 +161,7 @@ public:
 				bool wasAlive = !target->GetHealth().IsDead();
 				int previousHealth = target->GetHealth().GetCurrentHealth();
 
-				target->GetHealth().RemoveHealth(meleeDamage);
+				target->GetHealth().RemoveHealth(attackDamage);
 
 				int damageDealt = previousHealth - target->GetHealth().GetCurrentHealth();
 
@@ -155,7 +182,29 @@ public:
 
 	virtual void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager)
 	{
-		std::cout << "Only calling here" << std::endl;
+	}
+	virtual void Utility()
+	{
+		int horizontal = 0;
+		int vertical = 0;
+		if (orientation.x < 0)
+		{
+			horizontal = -50;
+		}
+		else if (orientation.x > 0)
+		{
+			horizontal = 50;
+		}
+		if (orientation.y < 0)
+		{
+			vertical = -50;
+		}
+		else if (orientation.y > 0)
+		{
+			vertical = 50;
+		}
+		Vector2 direction(GetPosition().x - (GetPosition().x - horizontal), GetPosition().y - (GetPosition().y - vertical));
+		ApplyKnockback(direction, 400.0f);
 	}
 
 	virtual bool CanBeDamaged() const override
@@ -164,12 +213,17 @@ public:
 	}
 	bool ConsumeMeleeRequest()
 	{
-		if (!requestingMelee)
+		if (!requestingAttack)
+		{
+			return false;
+		}
+		if (attackTimer > 0)
 		{
 			return false;
 		}
 
-		requestingMelee = false;
+		attackTimer = attackCooldown;
+		requestingAttack = false;
 		return true;
 	}
 	bool ConsumeAbilityRequest()
@@ -178,29 +232,61 @@ public:
 		{
 			return false;
 		}
+		if (abilityTimer > 0)
+		{
+			return false;
+		}
 
+		abilityTimer = abilityCooldown;
 		requestingAbility = false;
+		return true;
+	}
+	bool ConsumeUtilityRequest()
+	{
+		if (!requestingUtility)
+		{
+			return false;
+		}
+		if (utilityTimer > 0)
+		{
+			return false;
+		}
+
+		utilityTimer = utilityCooldown;
+		requestingUtility = false;
 		return true;
 	}
 	void SetInput(const Vector2& _inputAxis)
 	{
 		inputAxis = _inputAxis;
 	}
-	void SetMeleeInput(bool _meleeInput)
+	void SetattackInput(bool _attackInput)
 	{
-		meleeInput = _meleeInput;
+		attackInput = _attackInput;
 	}
 	void SetAbilityInput(bool _abilityInput)
 	{
 		abilityInput = _abilityInput;
 	}
+	void SetUtilityInput(bool _utilityInput)
+	{
+		utilityInput = _utilityInput;
+	}
 	void SetMoveSpeed(float _moveSpeed)
 	{
 		moveSpeed = _moveSpeed;
 	}
-	void SetMeleeDamage(float _meleeDamage)
+	void SetattackDamage(float _attackDamage)
 	{
-		meleeDamage = _meleeDamage;
+		attackDamage = _attackDamage;
+	}
+	void SetAttackCooldown(float _attackCooldown)
+	{
+		attackCooldown = _attackCooldown;
+	}
+	void SetAbilityCooldown(float _abilityCooldown)
+	{
+		abilityCooldown = _abilityCooldown;
 	}
 	const Vector2& GetInput() const
 	{
@@ -214,27 +300,49 @@ public:
 	{
 		return moveSpeed;
 	}
-	float GetMeleeDamage()
+	float GetattackDamage()
 	{
-		return meleeDamage;
+		return attackDamage;
+	}
+	float GetAttackCooldown()
+	{
+		return attackCooldown;
+	}
+	float GetAbilityCooldown()
+	{
+		return abilityCooldown;
+	}
+	Vector2 GetOrientation()
+	{
+		return orientation;
+	}
+	Team GetTeam() override
+	{
+		return Team::Player;
 	}
 	
 private:
 	float moveSpeed = 128.0f;
-	float meleeDamage = 25.0f;
-	float meleeRange = 32.0f;
+	float attackDamage = 25.0f;
+	float attackRange = 32.0f;
 
-	bool requestingMelee = false;
-	bool previousMeleeInput = false;
-	bool meleeInput = false;
-	float meleeCooldown = 0.5f;
-	float meleeTimer = 0.0f;
+	bool requestingAttack = false;
+	bool previousAttackInput = false;
+	bool attackInput = false;
+	float attackCooldown = 0.5f;
+	float attackTimer = 0.0f;
 
 	bool requestingAbility = false;
 	bool previousAbilityInput = false;
 	bool abilityInput = false;
 	float abilityCooldown = 10.0f;
 	float abilityTimer = 0.0f;
+
+	bool requestingUtility = false;
+	bool previousUtilityInput = false;
+	bool utilityInput = false;
+	float utilityCooldown = 5.0f;
+	float utilityTimer = 0.0f;
 
 	Vector2 inputAxis;
 	Vector2 orientation = { 0, 1 };
@@ -254,8 +362,41 @@ public:
 	void Update(float deltaTime, Tilemap& tilemap) override
 	{
 		// Implement specific update logic for PlayerWarrior
+
+		if (defenseTimer > 0)
+		{
+			defenseTimer -= deltaTime;
+			if (defenseTimer <= 0)
+			{
+				defenseTimer = 0;
+				ToggleAbility(false);
+			}
+		}
+
 		Player::Update(deltaTime, tilemap);
 	}
+
+	void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager) override
+	{
+		ToggleAbility(true);
+		defenseTimer = defenseDuration;
+	}
+
+	void ToggleAbility(bool _toggle)
+	{
+		if (_toggle)
+		{
+			GetHealth().SetDamageReduction(0.75f);
+		}
+		else
+		{
+			GetHealth().SetDamageReduction(0.0f);
+		}
+	}
+private:
+	bool abilityActive = false;
+	float defenseTimer = 0.0f;
+	float defenseDuration = 2.0f;
 };
 
 class PlayerArcher : public Player
@@ -265,8 +406,16 @@ public:
 	{
 		std::cout << "Init Archer" << std::endl;
 		GetHealth().SetMaxHealth(85);
-		SetMeleeDamage(20.0f);
+		SetattackDamage(20.0f);
 		SetMoveSpeed(192.0f);
+
+		SetAttackCooldown(0.4f);
+		SetAbilityCooldown(8.0f);
+	}
+
+	void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager) override
+	{
+		projectileManager.FireProjectile(GetPosition(), GetOrientation(), ProjectileOwner::Player, "./assets/Projectile.png");
 	}
 
 	// Ricochet ability for archer - bounces an attack between up to a max amount of enemies
@@ -279,7 +428,7 @@ public:
 		Vector2 searchPosition(GetPosition().x + GetWidth() * 0.5f, GetPosition().y + GetHeight() * 0.5f);
 
 		const float range = 200.0f;
-		const float damage = GetMeleeDamage() * 0.75f;
+		const float damage = GetattackDamage() * 0.75f;
 		const int maxTargets = 5;
 
 		// Loop until attained all targets nearby
@@ -372,8 +521,35 @@ public:
 	PlayerMage(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
 	{
 		GetHealth().SetMaxHealth(100);
-		SetMeleeDamage(20.0f);
+		SetattackDamage(20.0f);
 		SetMoveSpeed(160.0f);
+
+		SetAttackCooldown(0.6f);
+		SetAbilityCooldown(6.0f);
+	}
+
+	void Update(float deltaTime, Tilemap& tilemap) override
+	{
+		Player::Update(deltaTime, tilemap);
+		if (manaTimer > 0.0f || mana < 100)
+		{
+			manaTimer -= deltaTime;
+
+			if (manaTimer <= 0.0f)
+			{
+				mana++;
+				manaTimer = manaCooldown;
+			}
+		}
+	}
+
+	void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager) override
+	{
+		if (mana >= 20)
+		{
+			mana -= 20;
+			projectileManager.FireProjectile(GetPosition(), GetOrientation(), ProjectileOwner::Player, "./assets/Projectile.png");
+		}
 	}
 
 	// Magic Ability - Get all the nearby enemies and pick out 3 with the highest health -> deal damage (no knockback)
@@ -384,7 +560,7 @@ public:
 		Vector2 searchPosition(GetPosition().x + GetWidth() * 0.5f, GetPosition().y + GetHeight() * 0.5f);
 
 		const float range = 250.0f;
-		const float damage = GetMeleeDamage() * 1.5f;
+		const float damage = GetattackDamage() * 1.5f;
 		const int maxTargets = 3;
 
 		// Loop through all entities in the array (probably not too efficient) to find the ones within range of the player
@@ -473,119 +649,9 @@ public:
 			}
 		}
 	}
+
+	private:
+		float mana = 100.0f;
+		float manaCooldown = 0.1f;
+		float manaTimer = 0.0f;
 };
-
-//class Player
-//{
-//public:
-//	Player(const GamesEngineeringBase::Window& _canvas)
-//	{
-//		canvas = _canvas;
-//	}
-//
-//	void Init();
-//	void HandleInput();
-//	void Update();
-//	void Draw();
-//	void Destroy();
-//
-//	void MoveLeft()
-//	{
-//		position.x -= moveSpeed;
-//		orientation = 3;
-//
-//		if (position.x < 0)
-//		{
-//			position.x = 0;
-//		}
-//	}
-//
-//	void MoveRight()
-//	{
-//		position.x += moveSpeed;
-//		orientation = 1;
-//
-//		if (position.x > canvas.getWidth() - image.width)
-//		{
-//			position.x = canvas.getWidth() - image.width;
-//		}
-//	}
-//
-//	void MoveDown()
-//	{
-//		position.y += moveSpeed;
-//		orientation = 2;
-//
-//		if (position.y > (canvas.getHeight() - image.height))
-//		{
-//			position.y = canvas.getHeight() - image.height;
-//		}
-//	}
-//
-//	void MoveUp()
-//	{
-//		position.y -= moveSpeed;
-//		orientation = 0;
-//
-//		if (position.y < 0)
-//		{
-//			position.y = 0;
-//		}
-//	}
-//
-//	void MoveAbility()
-//	{
-//		if (abilityTimer.dt() < abilityCooldown)
-//		{
-//			return;
-//		}
-//
-//		switch (orientation)
-//		{
-//		case 0:
-//			position.y -= moveSpeed * 50;
-//			if (position.y < 0)
-//			{
-//				position.y = 0;
-//			}
-//			break;
-//		case 1:
-//			position.x += moveSpeed * 50;
-//			if (position.x > canvas.getWidth() - image.width)
-//			{
-//				position.x = canvas.getWidth() - image.width;
-//			}
-//			break;
-//		case 2:
-//			position.y += moveSpeed * 50;
-//			if (position.y > (canvas.getHeight() - image.height))
-//			{
-//				position.y = canvas.getHeight() - image.height;
-//			}
-//			break;
-//		case 3:
-//			position.x -= moveSpeed * 50;
-//			if (position.x < 0)
-//			{
-//				position.x = 0;
-//			}
-//			break;
-//		default:
-//			break;
-//		}
-//
-//		abilityTimer.reset();
-//	}
-//
-//private:
-//	int moveSpeed = 1;
-//	Vector2 position = Vector2(100, 100);
-//	unsigned int orientation = 0;
-//
-//	float abilityCooldown = 1.0f;
-//
-//	GamesEngineeringBase::Window canvas;
-//	GamesEngineeringBase::Image image;
-//	GamesEngineeringBase::Timer abilityTimer;
-//};
-

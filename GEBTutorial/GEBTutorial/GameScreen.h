@@ -2,6 +2,7 @@
 
 #include "GameLoop.h"
 #include "GamesEngineeringBase.h"
+#include "ProjectileManager.h"
 
 class GameManager;
 
@@ -76,6 +77,7 @@ private:
 	Player* player = nullptr;
 	Quadtree* quadtree = nullptr;
 	CollisionManager collisionManager;
+	ProjectileManager projectileManager;
 	Tilemap* tilemap = nullptr;
 	Camera* camera = nullptr;
 
@@ -103,6 +105,7 @@ private:
 	Player* player = nullptr;
 	Quadtree* quadtree = nullptr;
 	CollisionManager collisionManager;
+	ProjectileManager projectileManager;
 	Tilemap* tilemap = nullptr;
 	Camera* camera = nullptr;
 
