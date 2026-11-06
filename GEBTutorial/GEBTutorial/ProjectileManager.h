@@ -59,7 +59,7 @@ public:
 	}
 
 	// SHOULD FIGURE OUT A WAY TO FIT INTO COLLISION MANAGER AND QUADTREE, BAD IMPLEMENTATION HERE!!!
-	void CheckCollisions(DynamicArray<VisualEntity*>& entities, Quadtree& quadtree)
+	void CheckCollisions(DynamicArray<VisualEntity*>& entities, Quadtree& quadtree, ScoreManager& scoreManager)
 	{
 		// Get all the active projectiles (inactive not needed as they shouldn't show in game)
 		for (int i = 0; i < activeProjectiles.GetSize(); i++)
@@ -94,7 +94,27 @@ public:
 				// Check if projectile intersects with the target entity, if it does deal damage and deactivate projectile
 				if (quadtree.Intersects(projectile->GetBoundingBox(), target->GetBoundingBox()))
 				{
+					Vector2 direction(target->GetPosition().x - projectile->GetPosition().x, target->GetPosition().y - projectile->GetPosition().y);
+
+					target->ApplyKnockback(direction, 250.0f);
+
+					bool wasAlive = !target->GetHealth().IsDead();
+					int previousHealth = target->GetHealth().GetCurrentHealth();
+
 					target->GetHealth().RemoveHealth(projectile->GetDamage());
+
+					int damageDealt = previousHealth - target->GetHealth().GetCurrentHealth();
+
+					if (damageDealt > 0)
+					{
+						scoreManager.AddScore(damageDealt * 0.75f);
+					}
+					if (wasAlive && target->GetHealth().IsDead())
+					{
+						scoreManager.AddKill(150);
+						std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+					}
+
 					projectile->Deactivate();
 					break;
 				}

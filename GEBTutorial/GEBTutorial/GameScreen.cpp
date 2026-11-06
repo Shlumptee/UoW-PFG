@@ -200,7 +200,7 @@ void GameplayScreen::Update(float deltaTime)
     quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
 
     projectileManager.Update(deltaTime, *tilemap);
-    projectileManager.CheckCollisions(entities, *quadtree);
+    projectileManager.CheckCollisions(entities, *quadtree, gameManager.GetScoreManager());
 
     if (player->ConsumeMeleeRequest())
     {
@@ -386,7 +386,7 @@ void GameplayScreenInfinite::Update(float deltaTime)
     quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
 
     projectileManager.Update(deltaTime, *tilemap);
-    projectileManager.CheckCollisions(entities, *quadtree);
+    projectileManager.CheckCollisions(entities, *quadtree, gameManager.GetScoreManager());
 
     if (player->ConsumeMeleeRequest())
     {
