@@ -197,7 +197,7 @@ void GameplayScreen::Update(float deltaTime)
     collisionManager.Update(*quadtree, entities);
 
     camera->Follow(*player);
-    quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
+    quadtree->SetBounds(Rect(camera->GetPosition(), Vector2(camera->GetPosition().x + window.getWidth(), camera->GetPosition().y + window.getHeight())));
 
     projectileManager.Update(deltaTime, *tilemap);
     projectileManager.CheckCollisions(entities, *quadtree, gameManager.GetScoreManager());
