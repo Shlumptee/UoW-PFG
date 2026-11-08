@@ -70,6 +70,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <SourcePath>$(VC_SourcePath);$(ProjectDir)src;$(SourcePath)</SourcePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -139,33 +143,33 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="GameLoop.cpp" />
-    <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="GameScreen.cpp" />
-    <ClCompile Include="GEBase.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Tilemap.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\GameLoop.cpp" />
+    <ClCompile Include="src\GameManager.cpp" />
+    <ClCompile Include="src\GameScreen.cpp" />
+    <ClCompile Include="src\GEBase.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\Tilemap.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CollisionManager.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="GameLoop.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="GameScreen.h" />
-    <ClInclude Include="GamesEngineeringBase.h" />
-    <ClInclude Include="Health.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Projectile.h" />
-    <ClInclude Include="ProjectileManager.h" />
-    <ClInclude Include="Quadtree.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="ScoreManager.h" />
-    <ClInclude Include="Shape.h" />
-    <ClInclude Include="Tilemap.h" />
-    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\CollisionManager.h" />
+    <ClInclude Include="include\Enemy.h" />
+    <ClInclude Include="include\Entity.h" />
+    <ClInclude Include="include\GameLoop.h" />
+    <ClInclude Include="include\GameManager.h" />
+    <ClInclude Include="include\GameScreen.h" />
+    <ClInclude Include="include\GamesEngineeringBase.h" />
+    <ClInclude Include="include\Health.h" />
+    <ClInclude Include="include\Player.h" />
+    <ClInclude Include="include\Projectile.h" />
+    <ClInclude Include="include\ProjectileManager.h" />
+    <ClInclude Include="include\Quadtree.h" />
+    <ClInclude Include="include\Renderer.h" />
+    <ClInclude Include="include\ScoreManager.h" />
+    <ClInclude Include="include\Shape.h" />
+    <ClInclude Include="include\Tilemap.h" />
+    <ClInclude Include="include\Vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

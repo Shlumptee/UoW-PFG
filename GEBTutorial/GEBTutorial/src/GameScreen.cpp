@@ -226,7 +226,7 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
             window.draw(j, i, 0, 0, 128);
         }
     }*/
-    Render_Background(window);
+    //Render_Background(window);
 
     tilemap->Draw(window, *camera);
 
