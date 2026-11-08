@@ -112,7 +112,7 @@ public:
 					if (wasAlive && target->GetHealth().IsDead())
 					{
 						scoreManager.AddKill(150);
-						std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+						//std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
 					}
 
 					projectile->Deactivate();

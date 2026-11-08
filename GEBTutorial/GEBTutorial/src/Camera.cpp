@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Entity.h"
 
+// Camera constructors
 Camera::Camera()
 {
 	position = { 0, 0 };
@@ -16,6 +17,7 @@ Camera::Camera(Vector2 _cameraSizeMin, Vector2 _cameraSizeMax)
 	worldPosMax = _cameraSizeMax;
 }
 
+// Function to make the camera follow a target
 void Camera::Follow(VisualEntity& target)
 {
 	Vector2 targetPos = target.GetPosition();
@@ -33,6 +35,7 @@ void Camera::Follow(VisualEntity& target)
 	ToWorld();
 }
 
+
 void Camera::SetWorldBounds(Vector2 boundsMin, Vector2 boundsMax)
 {
 	worldPosMin = boundsMin;
@@ -40,6 +43,7 @@ void Camera::SetWorldBounds(Vector2 boundsMin, Vector2 boundsMax)
 
 	ToWorld();
 }
+// Get camera position so other entities can adjust where their position is relative to the camera
 Vector2 Camera::GetPosition()
 {
 	return position;

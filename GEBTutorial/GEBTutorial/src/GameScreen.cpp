@@ -112,6 +112,11 @@ void GameplayScreen::Init()
         player = new PlayerWarrior(Vector2(100, 100), "./assets/Circle.png");
         break;
     }
+    if (gameManager.GetPlayerHealth() != -1)
+    {
+        player->GetHealth().SetCurrentHealth(gameManager.GetPlayerHealth());
+    }
+
     entities.Push(player);
     entities.Push(new SkeletonEnemy(Vector2(400, 400), player, "./assets/SkeletonEnemy.png", &projectileManager));
     entities.Push(new SlimeEnemy(Vector2(600, 110), player, "./assets/SlimeEnemy.png"));
@@ -168,6 +173,7 @@ void GameplayScreen::Update(float deltaTime)
 	// Update gameplay screen
     if (player->GetHealth().IsDead())
     {
+        gameManager.SetPlayerHealth(-1.0f);
         gameManager.SetState(GameState::GameOver);
         return;
     }
@@ -177,6 +183,7 @@ void GameplayScreen::Update(float deltaTime)
         levelTimer -= deltaTime;
         if (levelTimer <= 0)
         {
+            gameManager.SetPlayerHealth(player->GetHealth().GetCurrentHealth());
             gameManager.SetState(GameState::TallyScreen);
             return;
         }
@@ -240,6 +247,7 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
     //Render_String(window, fontImage, "sjdnsjdjsdhjsdhsjdhjsdhjsdhjshdjhdsjhshdjsd", Vector2(0, 0));
 	RenderFPSCounter(window);
     Render_Number(window, gameManager.fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
+    Render_Number(window, gameManager.fontImage, (int)player->GetMana(), Vector2(32, 32), 32);
     std::string timeRemaining = "Time: " + std::to_string((int)levelTimer);
     Render_String(window, gameManager.fontImage, timeRemaining.c_str(), Vector2(32, 768 - 32), 32);
 }
@@ -354,6 +362,7 @@ void GameplayScreenInfinite::Update(float deltaTime)
 
     if (player->GetHealth().IsDead())
     {
+        gameManager.SetPlayerHealth(-1.0f);
         gameManager.SetState(GameState::GameOver);
         return;
     }
@@ -363,6 +372,7 @@ void GameplayScreenInfinite::Update(float deltaTime)
         levelTimer -= deltaTime;
         if (levelTimer <= 0)
         {
+            gameManager.SetPlayerHealth(player->GetHealth().GetCurrentHealth());
             gameManager.SetState(GameState::TallyScreen);
             return;
         }
@@ -383,7 +393,7 @@ void GameplayScreenInfinite::Update(float deltaTime)
     collisionManager.Update(*quadtree, entities);
 
     camera->Follow(*player);
-    quadtree->SetBounds(Rect(Vector2(camera->GetPosition().x - (window.getWidth() / 2), camera->GetPosition().y - (window.getHeight() / 2)), Vector2(camera->GetPosition().x + (window.getWidth() / 2), camera->GetPosition().y + (window.getHeight() / 2))));
+    quadtree->SetBounds(Rect(camera->GetPosition(), Vector2(camera->GetPosition().x + window.getWidth(), camera->GetPosition().y + window.getHeight())));
 
     projectileManager.Update(deltaTime, *tilemap);
     projectileManager.CheckCollisions(entities, *quadtree, gameManager.GetScoreManager());
@@ -415,8 +425,13 @@ void GameplayScreenInfinite::Draw(GamesEngineeringBase::Window& window)
     {
         entities[i]->Draw(window, *camera);
     }
+
+    //Render_String(window, fontImage, "sjdnsjdjsdhjsdhsjdhjsdhjsdhjshdjhdsjhshdjsd", Vector2(0, 0));
     RenderFPSCounter(window);
     Render_Number(window, gameManager.fontImage, (int)player->GetHealth().GetCurrentHealth(), Vector2(32, 0), 32);
+    Render_Number(window, gameManager.fontImage, (int)player->GetMana(), Vector2(32, 32), 32);
+    std::string timeRemaining = "Time: " + std::to_string((int)levelTimer);
+    Render_String(window, gameManager.fontImage, timeRemaining.c_str(), Vector2(32, 768 - 32), 32);
 }
 
 void GameplayScreenInfinite::Destroy()
@@ -561,8 +576,8 @@ void GameOverScreen::Draw(GamesEngineeringBase::Window& window)
     Render_String(window, gameManager.fontImage, killsString.c_str(), { 50, 200 });
     Render_String(window, gameManager.fontImage, timeAliveString.c_str(), { 50, 300 });
 
-    Render_String(window, gameManager.fontImage, "SPACE for next level", { 50, 500 });
-    Render_String(window, gameManager.fontImage, "R to restart game", {50, 600});
+    Render_String(window, gameManager.fontImage, "R to restart game", { 50, 500 });
+    Render_String(window, gameManager.fontImage, "M to quit to menu", {50, 600});
 
     RenderFPSCounter(window);
 }

@@ -1,6 +1,10 @@
 #pragma once
 
-#include "GameLoop.h"
+#include "Player.h"
+#include "Quadtree.h"
+#include "CollisionManager.h"
+#include "Tilemap.h"
+#include "Camera.h"
 #include "GamesEngineeringBase.h"
 #include "ProjectileManager.h"
 

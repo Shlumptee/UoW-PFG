@@ -55,7 +55,7 @@ public:
                 // Check to see if the bounding boxes intersect with each other, if so there is a collision
                 if (quadtree.Intersects(entity->GetBoundingBox(), candidate.boundingBox))
                 {
-                    std::cout << "Collision detected between entity " << i << " and entity " << otherIndex << std::endl;
+                    //std::cout << "Collision detected between entity " << i << " and entity " << otherIndex << std::endl;
                     // Call collision resolution for both entities
                     OnCollision(entity, candidate.entity);
                 }

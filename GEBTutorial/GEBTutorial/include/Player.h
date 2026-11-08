@@ -15,7 +15,7 @@ class Player : public VisualEntity
 public:
 	Player(const Vector2 position, std::string filePath) : VisualEntity(position, filePath)
 	{
-		std::cout << "Init Player" << std::endl;
+		//std::cout << "Init Player" << std::endl;
 	}
 
 
@@ -48,6 +48,17 @@ public:
 		if (utilityTimer < 0)
 		{
 			utilityTimer = 0;
+		}
+
+		if (manaTimer > 0.0f)
+		{
+			manaTimer -= deltaTime;
+
+			if (manaTimer <= 0.0f && mana < maxMana)
+			{
+				mana++;
+				manaTimer = manaCooldown;
+			}
 		}
 
 		previousPosition = GetPosition();
@@ -109,7 +120,7 @@ public:
 	virtual void Draw(GamesEngineeringBase::Window& window, Camera& camera) override
 	{
 		VisualEntity::Draw(window, camera);
-		Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
+		//Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
 	virtual void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager)
@@ -172,7 +183,7 @@ public:
 				if (wasAlive && target->GetHealth().IsDead())
 				{
 					scoreManager.AddKill(150);
-					std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+					//std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
 				}
 
 				//std::cout << "Enemy Hit! Health: " << target->GetHealth().GetCurrentHealth() << std::endl;
@@ -236,7 +247,12 @@ public:
 		{
 			return false;
 		}
-
+		if (mana < 20)
+		{
+			return false;
+		}
+		mana -= 20;
+		manaTimer = manaCooldown;
 		abilityTimer = abilityCooldown;
 		requestingAbility = false;
 		return true;
@@ -288,6 +304,23 @@ public:
 	{
 		abilityCooldown = _abilityCooldown;
 	}
+	void SetManaCooldown(float _manaCooldown)
+	{
+		manaCooldown = _manaCooldown;
+	}
+	void SetMaxMana(float _maxMana)
+	{
+		maxMana = _maxMana;
+		mana = _maxMana;
+	}
+	void SetMana(float _mana)
+	{
+		mana = _mana;
+	}
+	void SetManaTimer(float _manaTimer)
+	{
+		manaTimer = _manaTimer;
+	}
 	const Vector2& GetInput() const
 	{
 		return inputAxis;
@@ -320,11 +353,28 @@ public:
 	{
 		return Team::Player;
 	}
+	float GetMaxMana()
+	{
+		return maxMana;
+	}
+	float GetMana()
+	{
+		return mana;
+	}
+	float GetManaCooldown()
+	{
+		return manaCooldown;
+	}
 	
 private:
 	float moveSpeed = 128.0f;
 	float attackDamage = 25.0f;
 	float attackRange = 32.0f;
+
+	float mana = 100.0f;
+	float maxMana = 100.0f;
+	float manaCooldown = 0.5f;
+	float manaTimer = manaCooldown;
 
 	bool requestingAttack = false;
 	bool previousAttackInput = false;
@@ -404,7 +454,7 @@ class PlayerArcher : public Player
 public:
 	PlayerArcher(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
 	{
-		std::cout << "Init Archer" << std::endl;
+		//std::cout << "Init Archer" << std::endl;
 		GetHealth().SetMaxHealth(85);
 		SetattackDamage(20.0f);
 		SetMoveSpeed(192.0f);
@@ -509,7 +559,7 @@ public:
 			if (wasAlive && target->GetHealth().IsDead())
 			{
 				scoreManager.AddKill(150);
-				std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+				//std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
 			}
 		}
 	}
@@ -526,28 +576,22 @@ public:
 
 		SetAttackCooldown(0.6f);
 		SetAbilityCooldown(6.0f);
+
+		SetManaCooldown(0.2f);
+		SetMaxMana(120.0f);
 	}
 
 	void Update(float deltaTime, Tilemap& tilemap) override
 	{
 		Player::Update(deltaTime, tilemap);
-		if (manaTimer > 0.0f || mana < 100)
-		{
-			manaTimer -= deltaTime;
-
-			if (manaTimer <= 0.0f)
-			{
-				mana++;
-				manaTimer = manaCooldown;
-			}
-		}
 	}
 
 	void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager) override
 	{
-		if (mana >= 20)
+		if (GetMana() >= 15)
 		{
-			mana -= 20;
+			SetMana(GetMana() - 15.0f);
+			SetManaTimer(GetManaCooldown());
 			projectileManager.FireProjectile(GetPosition(), GetOrientation(), GetattackDamage(), ProjectileOwner::Player, "./assets/Projectile.png");
 		}
 	}
@@ -645,7 +689,7 @@ public:
 			if (wasAlive && target->GetHealth().IsDead())
 			{
 				scoreManager.AddKill(150);
-				std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
+				//std::cout << "Enemy killed! Score: " << scoreManager.GetScore() << std::endl;
 			}
 		}
 	}

@@ -51,6 +51,10 @@ public:
 	{
 		playerClass = _playerClass;
 	}
+	void SetPlayerHealth(float _playerHealth)
+	{
+		playerHealth = _playerHealth;
+	}
 	GameState GetState() const
 	{
 		return currentState;
@@ -66,6 +70,10 @@ public:
 	PlayerClass GetPlayerClass()
 	{
 		return playerClass;
+	}
+	float GetPlayerHealth()
+	{
+		return playerHealth;
 	}
 
 private:
@@ -87,6 +95,8 @@ private:
 
 	bool isRunning = false;
 	float deltaTime = 0.0f;
+
+	float playerHealth = -1;
 
 	void ChangeScreen();
 };
