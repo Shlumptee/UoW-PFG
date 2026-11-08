@@ -9,11 +9,13 @@ public:
 		kills = 0;
 		timeAlive = 0.0f;
 	}
+	// Update how long the player has been alive for
 	void Update(float deltaTime)
 	{
 		timeAlive += deltaTime;
 	}
 
+	// Add score
 	void AddScore(int amount)
 	{
 		if (amount > 0)
@@ -21,12 +23,14 @@ public:
 			score += amount;
 		}
 	}
+	// Increase kill count and add score
 	void AddKill(int amount)
 	{
 		kills++;
 		AddScore(amount);
 	}
 
+	// Getters and setters
 	int GetScore() const
 	{
 		return score;

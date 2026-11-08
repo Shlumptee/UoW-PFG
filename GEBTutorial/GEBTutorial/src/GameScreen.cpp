@@ -5,12 +5,14 @@
 #include "Enemy.h"
 #include "GameManager.h"
 
+// Render the fps counter across all screen states
 void GameScreen::RenderFPSCounter(GamesEngineeringBase::Window& window)
 {
     std::string fpsString = "FPS:" + std::to_string(fps);
     Render_String(window, gameManager.fontImage, fpsString.c_str(), Vector2(1024 - 32 * 8, 768 - 32), 32);
 }
 
+// Pick a random map for the game loop
 std::string ChooseRandomMap()
 {
     std::random_device rd;
@@ -27,18 +29,22 @@ void MainMenuScreen::Init()
 	// Initialize main menu screen
 }
 
+// Handle main menu input
 void MainMenuScreen::HandleInput()
 {
+    // Warrior
     if (window.keyPressed('I'))
     {
         gameManager.SetPlayerClass(PlayerClass::Warrior);
         gameManager.SetState(GameState::Game);
     }
+    //Archer
     else if (window.keyPressed('O'))
     {
         gameManager.SetPlayerClass(PlayerClass::Archer);
         gameManager.SetState(GameState::Game);
     }
+    // Mage
     else if (window.keyPressed('P'))
     {
         gameManager.SetPlayerClass(PlayerClass::Mage);
@@ -52,6 +58,7 @@ void MainMenuScreen::Update(float deltaTime)
     UpdateFPSCounter(deltaTime);
 }
 
+// Draw all text
 void MainMenuScreen::Draw(GamesEngineeringBase::Window& window)
 {
 	// Draw main menu screen
@@ -91,11 +98,7 @@ void GameplayScreen::Init()
 	GameScreen::Init();
 
     quadtree = new Quadtree(0, Rect(Vector2(0, 0), Vector2(1024 * 3, 768 * 3)));
-    tilemap = new Tilemap(
-        Vector2(64, 64),
-        64,
-        Vector2(0, 0),
-        ChooseRandomMap(), "./assets/TileMapAtlas.png");
+    tilemap = new Tilemap(Vector2(64, 64), 64, Vector2(0, 0), ChooseRandomMap(), "./assets/TileMapAtlas.png");
 
     switch (gameManager.GetPlayerClass())
     {
@@ -112,11 +115,15 @@ void GameplayScreen::Init()
         player = new PlayerWarrior(Vector2(100, 100), "./assets/Circle.png");
         break;
     }
+
+    // If gamemanager's health storage has changed, set the player health to whatever this is
+    // This is a very cheesy way of retaining health across levels due to the game architecture
     if (gameManager.GetPlayerHealth() != -1)
     {
         player->GetHealth().SetCurrentHealth(gameManager.GetPlayerHealth());
     }
 
+    // Push all entities into the DynamicArray
     entities.Push(player);
     entities.Push(new SkeletonEnemy(Vector2(400, 400), player, "./assets/SkeletonEnemy.png", &projectileManager));
     entities.Push(new SlimeEnemy(Vector2(600, 110), player, "./assets/SlimeEnemy.png"));
@@ -139,6 +146,8 @@ void GameplayScreen::HandleInput()
 {
 	// Handle input for gameplay screen
     // Check for input (key presses or window events)
+
+    // Player movement
     input.Set(0, 0);
     if (window.keyPressed('A'))
     {
@@ -158,10 +167,13 @@ void GameplayScreen::HandleInput()
     }
 
     player->SetInput(input);
+
+    // Set input functions based off of if the player presses specific keys
     player->SetattackInput(window.keyPressed('E'));
     player->SetAbilityInput(window.keyPressed('Q'));
     player->SetUtilityInput(window.keyPressed(VK_SHIFT));
 
+    // Force a game over if tab is pressed
     if (window.keyPressed(VK_TAB))
     {
         gameManager.SetState(GameState::GameOver);
@@ -171,6 +183,8 @@ void GameplayScreen::HandleInput()
 void GameplayScreen::Update(float deltaTime)
 {
 	// Update gameplay screen
+
+    // If the player has died, change to game over and set gamemanager's health storage to default
     if (player->GetHealth().IsDead())
     {
         gameManager.SetPlayerHealth(-1.0f);
@@ -178,6 +192,7 @@ void GameplayScreen::Update(float deltaTime)
         return;
     }
 
+    // Reduce remaining time on level, and move to tally screen if the player survived
     if (levelTimer > 0)
     {
         levelTimer -= deltaTime;
@@ -189,9 +204,11 @@ void GameplayScreen::Update(float deltaTime)
         }
     }
 
+    // Update fps and score
 	UpdateFPSCounter(deltaTime);
 	gameManager.GetScoreManager().Update(deltaTime);
 
+    // Update entities and store them in the quadtree
     quadtree->Clear();
     for (int i = 0; i < entities.GetSize(); i++)
     {
@@ -201,14 +218,18 @@ void GameplayScreen::Update(float deltaTime)
         quadtree->Insert(object);
     }
 
+    // run collisionmanager once all entities are in the quadtree
     collisionManager.Update(*quadtree, entities);
 
-    camera->Follow(*player);
-    quadtree->SetBounds(Rect(camera->GetPosition(), Vector2(camera->GetPosition().x + window.getWidth(), camera->GetPosition().y + window.getHeight())));
-
+    // Update projectiles
     projectileManager.Update(deltaTime, *tilemap);
     projectileManager.CheckCollisions(entities, *quadtree, gameManager.GetScoreManager());
 
+    // Move camera and set the bounds of the quadtree to the cam pos for next frame
+    camera->Follow(*player);
+    quadtree->SetBounds(Rect(camera->GetPosition(), Vector2(camera->GetPosition().x + window.getWidth(), camera->GetPosition().y + window.getHeight())));
+
+    // Check whether a player input function must be made
     if (player->ConsumeMeleeRequest())
     {
         player->MeleeAttack(*quadtree, entities, gameManager.GetScoreManager(), projectileManager);
@@ -223,6 +244,7 @@ void GameplayScreen::Update(float deltaTime)
     }
 }
 
+// Draw stuff!
 void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
 {
 	// Draw gameplay screen
@@ -252,6 +274,7 @@ void GameplayScreen::Draw(GamesEngineeringBase::Window& window)
     Render_String(window, gameManager.fontImage, timeRemaining.c_str(), Vector2(32, 768 - 32), 32);
 }
 
+// Clear all resources used in this screen
 void GameplayScreen::Destroy()
 {
 	// Clean up resources for gameplay screen
@@ -281,6 +304,7 @@ void GameplayScreen::Destroy()
 
 #pragma region GameplayScreenInfinite
 
+// !! GAMEPLAYSCREENINFINITE IS THE SAME AS GAMEPLAYSCREEN, I'M TOO LAZY TO CODE COMMENT BUT ITS ALL THE SAME !!
 void GameplayScreenInfinite::Init()
 {
     GameScreen::Init();
@@ -392,11 +416,11 @@ void GameplayScreenInfinite::Update(float deltaTime)
 
     collisionManager.Update(*quadtree, entities);
 
-    camera->Follow(*player);
-    quadtree->SetBounds(Rect(camera->GetPosition(), Vector2(camera->GetPosition().x + window.getWidth(), camera->GetPosition().y + window.getHeight())));
-
     projectileManager.Update(deltaTime, *tilemap);
     projectileManager.CheckCollisions(entities, *quadtree, gameManager.GetScoreManager());
+
+    camera->Follow(*player);
+    quadtree->SetBounds(Rect(camera->GetPosition(), Vector2(camera->GetPosition().x + window.getWidth(), camera->GetPosition().y + window.getHeight())));
 
     if (player->ConsumeMeleeRequest())
     {
@@ -468,15 +492,19 @@ void TallyScreen::Init()
 	// Initialize tally screen
 	GameScreen::Init();
 
+    // Get the scoremanager from gamemanager
     ScoreManager& scoreManager = gameManager.GetScoreManager();
 
+    // Store all tracked stuff
 	score = scoreManager.GetScore();
 	kills = scoreManager.GetKills();
 	timeAlive = scoreManager.GetTimeAlive();
 
+    // Divide time alive into minutes and seconds
 	int minutes = (int)(timeAlive / 60);
 	int seconds = (int)(timeAlive) % 60;
 
+    // Set textstrings
 	scoreString = "Score: " + std::to_string(score);
 	killsString = "Kills: " + std::to_string(kills);
 	timeAliveString = "Time Alive: " + std::to_string(minutes) + "m:" + std::to_string(seconds) + "s";

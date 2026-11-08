@@ -27,15 +27,18 @@ void Camera::Follow(VisualEntity& target)
 	position.x = targetPos.x + (target.GetWidth() * 0.5f) - viewportPos.x * 0.5f;
 	position.y = targetPos.y + (target.GetHeight() * 0.5f) - viewportPos.y * 0.5f;
 
+	// skip oif no bounds are assigned
 	if (worldPosMax.x == 0 && worldPosMax.y == 0)
 	{
 		return;
 	}
 
+	// Keep camera inside world
 	ToWorld();
 }
 
-
+// Setters and Getters
+// SHOULD PROBABLY MOVE TO HEADER FILE TO STAY IN LINE WITH REST OF CODE FORMATTING IN THIS PROJECT
 void Camera::SetWorldBounds(Vector2 boundsMin, Vector2 boundsMax)
 {
 	worldPosMin = boundsMin;
@@ -51,9 +54,11 @@ Vector2 Camera::GetPosition()
 
 void Camera::ToWorld()
 {
+	// Calculate furthest max position the camera can reach
 	float maxX = worldPosMax.x - viewportPos.x;
 	float maxY = worldPosMax.y - viewportPos.y;
 
+	// Prevent the max positions from going negative
 	if (maxX < 0)
 	{
 		maxX = 0;
@@ -63,6 +68,7 @@ void Camera::ToWorld()
 		maxY = 0;
 	}
 
+	// Stop camera moving past minimum boundary
 	if (position.x < worldPosMin.x)
 	{
 		position.x = 0;
@@ -72,6 +78,7 @@ void Camera::ToWorld()
 		position.y = 0;
 	}
 
+	// Stop camera moving past maximum boundary
 	if (position.x > maxX)
 	{
 		position.x = maxX;

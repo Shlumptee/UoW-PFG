@@ -1,17 +1,22 @@
 #include "GameManager.h"
 
+// Initialise the game
 int GameManager::Init()
 {
+	// Create window
     window.create(1024, 768, "Blast'ems++");
 
     isRunning = true;
 	fontImage.load("./assets/text2.png");
 
+	// Change the screen to the main menu
     ChangeScreen();
 
     return 1;
 }
 
+// Handle universal input across screens
+// This allows for the player to forceload screens and quit out anytime
 void GameManager::HandleInput()
 {
 	if (window.keyPressed(VK_ESCAPE))
@@ -49,6 +54,7 @@ void GameManager::HandleInput()
 	}
 }
 
+// Update deltatime and call current screen's update
 void GameManager::Update()
 {
 	deltaTime = timer.dt();
@@ -58,6 +64,7 @@ void GameManager::Update()
 	}
 }
 
+// Call current screen's draw
 void GameManager::Draw()
 {
 	if (currentScreen != nullptr)
@@ -66,6 +73,7 @@ void GameManager::Draw()
 	}
 }
 
+// Destroy all pointers in the manager when game closes
 void GameManager::Destroy()
 {
 	if (currentScreen)
@@ -75,12 +83,16 @@ void GameManager::Destroy()
     isRunning = false;
 }
 
+// Change the screen state
 void GameManager::ChangeScreen()
 {
+	// call destroy function for the previous screen being used
 	if (currentScreen != nullptr)
 	{
 		currentScreen->Destroy();
 	}
+
+	// Switch to the new game state
     switch (currentState)
     {
     case GameState::MainMenu:
@@ -104,6 +116,7 @@ void GameManager::ChangeScreen()
         break;
     }
 
+	// Call the screen's init function to set up screen
     if (currentScreen != nullptr)
     {
         currentScreen->Init();

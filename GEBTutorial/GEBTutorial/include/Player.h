@@ -13,6 +13,7 @@
 class Player : public VisualEntity
 {
 public:
+	// Constructor for player
 	Player(const Vector2 position, std::string filePath) : VisualEntity(position, filePath)
 	{
 		//std::cout << "Init Player" << std::endl;
@@ -21,17 +22,21 @@ public:
 
 	virtual void Update(float deltaTime, Tilemap& tilemap) override
 	{
+		// Run base update in visualentity
 		VisualEntity::Update(deltaTime, tilemap);
 
+		// Disable input requests
 		requestingAbility = false;
 		requestingAttack = false;
 		requestingUtility = false;
 
+		// if there is input set to the axis, update orientation accordingly
 		if (inputAxis.x != 0 || inputAxis.y != 0)
 		{
 			orientation = inputAxis;
 		}
 
+		// Timers for attacks, abilities, etc
 		abilityTimer -= deltaTime;
 		if (abilityTimer < 0)
 		{
@@ -61,14 +66,17 @@ public:
 			}
 		}
 
+		// Get previous pos and perform movement calculations to see if player can move in requested direction
 		previousPosition = GetPosition();
 		Vector2 movement = (inputAxis * moveSpeed) + GetKnockbackVelocity();
 		TileMove(movement, deltaTime, tilemap);
 
+		// Update any knockback received
 		UpdateKnockback(deltaTime);
 
 		boundingBox.Set(GetBoundingBox());
 
+		// Check for additional inputs
 		if (attackInput && !previousAttackInput)
 		{
 			requestingAttack = true;
@@ -88,24 +96,26 @@ public:
 	}
 	virtual void OnCollision(VisualEntity* other) override
 	{
+		// Run base collision
 		VisualEntity::OnCollision(other);
 		//SetPosition(previousPosition);
 
-		Rect otherBoundingBox = other->GetBoundingBox();
+
+		Rect otherBounds = other->GetBoundingBox();
 		Vector2 currentPosition = GetPosition();
 
 		Rect previousBounds = Rect(previousPosition, Vector2(previousPosition.x + GetWidth(), previousPosition.y + GetHeight()));
 
-		bool horizontalOverlap = currentPosition.x < otherBoundingBox.max.x && currentPosition.x + GetWidth() > otherBoundingBox.min.x;
-		bool verticalOverlap = currentPosition.y < otherBoundingBox.max.y && currentPosition.y + GetHeight() > otherBoundingBox.min.y;
+		bool horizontalOverlap = currentPosition.x < otherBounds.max.x && currentPosition.x + GetWidth() > otherBounds.min.x;
+		bool verticalOverlap = currentPosition.y < otherBounds.max.y && currentPosition.y + GetHeight() > otherBounds.min.y;
 
 		if (!horizontalOverlap || !verticalOverlap)
 		{
 			return;
 		}
 
-		bool horizontalCollision = previousBounds.max.x <= otherBoundingBox.min.x || previousBounds.min.x >= otherBoundingBox.max.x;
-		bool verticalCollision = previousBounds.max.y <= otherBoundingBox.min.y || previousBounds.min.y >= otherBoundingBox.max.y;
+		bool horizontalCollision = previousBounds.max.x <= otherBounds.min.x || previousBounds.min.x >= otherBounds.max.x;
+		bool verticalCollision = previousBounds.max.y <= otherBounds.min.y || previousBounds.min.y >= otherBounds.max.y;
 
 		if (horizontalCollision)
 		{
@@ -123,11 +133,14 @@ public:
 		//Render_Rect(window, boundingBox, camera.GetPosition(), GetColliding() ? 0 : 255, GetColliding() ? 255 : 0, 0, 1);
 	}
 
+	// Function to perform a melee attack
 	virtual void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager)
 	{
+		// Set up attack bounding box
 		Rect attackBounds;
 		Rect playerBounds = GetBoundingBox();
 
+		// Check what side of the player the attack box should be set
 		if (orientation.x > 0)
 		{
 			// Attacking to the right
@@ -149,6 +162,8 @@ public:
 			attackBounds.Set({ playerBounds.min.x, playerBounds.min.y - attackRange }, { playerBounds.max.x, playerBounds.min.y });
 		}
 
+		// Loop through all entities
+		// !! NOT EXACTLY IDEAL, SHOULD SEE IF CAN RETRIVE QUAD THE PLAYER IS IN!!
 		for (int i = 0; i < entities.GetSize(); i++)
 		{
 			VisualEntity* target = entities[i];
@@ -163,8 +178,10 @@ public:
 				continue;
 			}
 
+			// See if Both the target and attack boxes intersect
 			if (quadtree.Intersects(attackBounds, target->GetBoundingBox()))
 			{
+				// Get direction and apply knockback
 				Vector2 direction(target->GetPosition().x - GetPosition().x, target->GetPosition().y - GetPosition().y);
 
 				target->ApplyKnockback(direction, 250.0f);
@@ -172,10 +189,12 @@ public:
 				bool wasAlive = !target->GetHealth().IsDead();
 				int previousHealth = target->GetHealth().GetCurrentHealth();
 
+				// Deal damage
 				target->GetHealth().RemoveHealth(attackDamage);
 
 				int damageDealt = previousHealth - target->GetHealth().GetCurrentHealth();
 
+				// Check what scoremanager function to call - should only give large points for kills
 				if (damageDealt > 0)
 				{
 					scoreManager.AddScore(damageDealt * 0.75f);
@@ -194,10 +213,14 @@ public:
 	virtual void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager)
 	{
 	}
+
+	// Utility movement - make a short dash in the direction the player is facing
 	virtual void Utility()
 	{
 		int horizontal = 0;
 		int vertical = 0;
+
+		// Check orientation for where player should move
 		if (orientation.x < 0)
 		{
 			horizontal = -50;
@@ -214,14 +237,18 @@ public:
 		{
 			vertical = 50;
 		}
+		// Caluclate direction and use the knockback function to fake dashing
 		Vector2 direction(GetPosition().x - (GetPosition().x - horizontal), GetPosition().y - (GetPosition().y - vertical));
 		ApplyKnockback(direction, 400.0f);
 	}
 
+	// Override from visualentity, confirms entity can be damaged
 	virtual bool CanBeDamaged() const override
 	{
 		return true;
 	}
+
+	// Functions for consuming input requests, will check if input can be made and go back on cooldown
 	bool ConsumeMeleeRequest()
 	{
 		if (!requestingAttack)
@@ -272,6 +299,8 @@ public:
 		requestingUtility = false;
 		return true;
 	}
+	
+	// Lotsa getters and setters
 	void SetInput(const Vector2& _inputAxis)
 	{
 		inputAxis = _inputAxis;
@@ -404,6 +433,7 @@ private:
 class PlayerWarrior : public Player
 {
 public:
+	// most settings are the same for the warrior calss
 	PlayerWarrior(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
 	{
 		GetHealth().SetMaxHealth(150);
@@ -413,6 +443,7 @@ public:
 	{
 		// Implement specific update logic for PlayerWarrior
 
+		// Update timer for ability duration
 		if (defenseTimer > 0)
 		{
 			defenseTimer -= deltaTime;
@@ -426,12 +457,14 @@ public:
 		Player::Update(deltaTime, tilemap);
 	}
 
+	// Override for a high resistance ability - while active, damage is reduced
 	void Ability(DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager) override
 	{
 		ToggleAbility(true);
 		defenseTimer = defenseDuration;
 	}
 
+	// Toggle to choose whether damage reduction should be on or off
 	void ToggleAbility(bool _toggle)
 	{
 		if (_toggle)
@@ -452,6 +485,7 @@ private:
 class PlayerArcher : public Player
 {
 public:
+	// Set variables for the archer class
 	PlayerArcher(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
 	{
 		//std::cout << "Init Archer" << std::endl;
@@ -463,6 +497,7 @@ public:
 		SetAbilityCooldown(8.0f);
 	}
 
+	// Different attack - archer uses projectilemanager to shoot projectiles that can damage
 	void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager) override
 	{
 		projectileManager.FireProjectile(GetPosition(), GetOrientation(), GetattackDamage(), ProjectileOwner::Player, "./assets/Projectile.png");
@@ -502,15 +537,18 @@ public:
 					continue;
 				}
 
+				// If candidate is visited, skip past it
 				if (visitedTargets.Contains(candidate))
 				{
 					continue;
 				}
 
+				// Get position difference between current search pos and the candidate
 				Vector2 candidatePosition(candidate->GetPosition().x + candidate->GetWidth() * 0.5f, candidate->GetPosition().y + candidate->GetHeight() * 0.5f);
 				Vector2 positionDifference = candidatePosition - searchPosition;
 				float distance = positionDifference.Length();
 
+				// Check if candidate is within range
 				if (distance <= range && distance <= closestDistance)
 				{
 					closestDistance = distance;
@@ -568,6 +606,7 @@ public:
 class PlayerMage : public Player
 {
 public:
+	// Set variables for the mage class
 	PlayerMage(const Vector2 _position, std::string _filePath) : Player(_position, _filePath)
 	{
 		GetHealth().SetMaxHealth(100);
@@ -586,6 +625,7 @@ public:
 		Player::Update(deltaTime, tilemap);
 	}
 
+	// Different attack, shoots projectiles that cost mana. This is offset by a faster mana regen and higher maxmana
 	void MeleeAttack(Quadtree& quadtree, DynamicArray<VisualEntity*>& entities, ScoreManager& scoreManager, ProjectileManager& projectileManager) override
 	{
 		if (GetMana() >= 15)
@@ -601,6 +641,7 @@ public:
 	{
 		DynamicArray<VisualEntity*> targets;
 
+		// Get midpoint of the player
 		Vector2 searchPosition(GetPosition().x + GetWidth() * 0.5f, GetPosition().y + GetHeight() * 0.5f);
 
 		const float range = 250.0f;
@@ -627,6 +668,7 @@ public:
 			Vector2 positionDifference = candidatePosition - searchPosition;
 			float distance = positionDifference.Length();
 
+			// Check if within range
 			if (distance <= range)
 			{
 				targets.Push(candidate);
@@ -640,6 +682,7 @@ public:
 		{
 			int highestIndex = i;
 
+			// Loop through targets
 			for (int j = i + 1; j < targets.GetSize(); j++)
 			{
 				if (targets[j]->GetHealth().GetCurrentHealth() > targets[highestIndex]->GetHealth().GetCurrentHealth())
@@ -648,6 +691,7 @@ public:
 				}
 			}
 
+			// Perform a swap if highestindex has changed
 			if (highestIndex != i)
 			{
 				VisualEntity* temp = targets[i];
@@ -693,9 +737,4 @@ public:
 			}
 		}
 	}
-
-	private:
-		float mana = 100.0f;
-		float manaCooldown = 0.1f;
-		float manaTimer = 0.0f;
 };

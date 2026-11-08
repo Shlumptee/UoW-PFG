@@ -4,7 +4,7 @@
 #include "GameScreen.h"
 #include "ScoreManager.h"
 
-
+// Enum for game screens
 enum class GameState
 {
 	MainMenu,
@@ -14,6 +14,7 @@ enum class GameState
 	GameOver
 };
 
+// Enum for what type of class the player has selected
 enum class PlayerClass
 {
 	None,

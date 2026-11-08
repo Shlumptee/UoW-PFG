@@ -28,6 +28,7 @@ public:
 	virtual void Draw(GamesEngineeringBase::Window& window) = 0;
 	virtual void Destroy() = 0;
 
+	// Needed across all game screens
 	void UpdateFPSCounter(float deltaTime)
 	{
 		fpsCount++;
